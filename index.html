@@ -1,240 +1,546 @@
-
+ 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Jade Winds 3D</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:#182a32;font-family:Arial;color:white;touch-action:none}
-canvas{display:block}
-#hud{position:fixed;top:12px;left:12px;background:#102020dd;padding:12px;border-radius:12px;font-size:14px;z-index:2}
-#health{width:130px;height:9px;background:#572626;border-radius:9px;margin-top:5px;overflow:hidden}
-#bar{height:100%;width:100%;background:#39db76}
-#stick{position:fixed;bottom:22px;left:22px;width:112px;height:112px;border:2px solid #ffffff90;background:#ffffff25;border-radius:50%;z-index:3;touch-action:none}
-#knob{position:absolute;width:44px;height:44px;left:32px;top:32px;background:#ffffffd0;border-radius:50%}
-.btn{position:fixed;z-index:3;right:20px;border:2px solid #ffffffa0;border-radius:50%;color:white;font-weight:bold;touch-action:none}
-#attack{bottom:25px;width:76px;height:76px;background:#b83c35}
-#jump{bottom:110px;right:92px;width:58px;height:58px;background:#247da8}
-#start{position:fixed;inset:0;background:#07131dcc;z-index:5;display:grid;place-items:center;text-align:center;padding:22px}
-#card{max-width:340px;background:#182a35;padding:24px;border-radius:18px;border:1px solid #ffffff50}
-#play{background:#55dc91;border:0;padding:13px 30px;border-radius:10px;font-weight:bold;font-size:16px}
-#msg{position:fixed;bottom:160px;left:50%;transform:translateX(-50%);z-index:2;background:#101820bb;padding:7px 12px;border-radius:15px;font-size:12px;white-space:nowrap}
-</style>
+<title>Jade Winds | Fantasy Combat</title>
+
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.module.js"}}
 </script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;overflow:hidden;background:#91b9c8;color:white;font-family:Arial;touch-action:none}
+canvas{display:block}
+#hud{position:fixed;top:12px;left:12px;z-index:2;background:#101b24dd;border:1px solid #ffffff40;padding:12px;border-radius:12px;font-size:13px;min-width:155px}
+#health{height:9px;background:#572626;border-radius:8px;overflow:hidden;margin-top:5px}
+#bar{height:100%;width:100%;background:#55ed91}
+#stick{position:fixed;bottom:22px;left:22px;width:112px;height:112px;border:2px solid #ffffff90;background:#ffffff25;border-radius:50%;z-index:3;touch-action:none}
+#knob{position:absolute;width:44px;height:44px;left:32px;top:32px;background:#ffffffd0;border-radius:50%}
+.btn{position:fixed;z-index:3;border:2px solid #ffffffa0;border-radius:50%;color:white;font-weight:bold;touch-action:none}
+#attack{bottom:25px;right:20px;width:78px;height:78px;background:#b83c35}
+#jump{bottom:112px;right:91px;width:58px;height:58px;background:#247da8}
+#heavy{bottom:112px;right:20px;width:58px;height:58px;background:#9b6a27}
+#msg{position:fixed;bottom:160px;left:50%;transform:translateX(-50%);z-index:2;background:#101820bb;padding:8px 12px;border-radius:15px;font-size:12px;white-space:nowrap}
+#start{position:fixed;inset:0;background:linear-gradient(#102438bb,#08131deF);z-index:5;display:grid;place-items:center;text-align:center;padding:22px}
+#card{max-width:350px;background:#162b39ee;padding:25px;border-radius:20px;border:1px solid #b8e8d480;box-shadow:0 12px 50px #0008}
+#card h1{color:#a8f0ce;letter-spacing:3px}
+#play{background:#61e7a0;border:0;padding:14px 30px;border-radius:10px;font-weight:bold;font-size:16px}
+</style>
 </head>
 <body>
-<div id="hud"><b>JADE WINDS</b><br>HP: <span id="hp">100</span>/100<div id="health"><div id="bar"></div></div>Defeated: <span id="kills">0</span>/3</div>
+<div id="hud">
+<b style="color:#a8f0ce;letter-spacing:2px">JADE WINDS</b><br>
+HP: <span id="hp">100</span>/100
+<div id="health"><div id="bar"></div></div>
+Defeated: <span id="kills">0</span>/3
+<div style="margin-top:5px">Ancient Forest</div>
+</div>
+
 <div id="stick"><div id="knob"></div></div>
 <button id="jump" class="btn">JUMP</button>
 <button id="attack" class="btn">ATTACK</button>
-<div id="msg">Move close to enemies and attack</div>
-<div id="start"><div id="card"><h1>JADE WINDS</h1><p>3D Fantasy Fighting Prototype</p><p>Automatically created camera, forest, player, enemies and touch controls.</p><button id="play">PLAY GAME</button></div></div>
+<button id="heavy" class="btn">POWER</button>
+<div id="msg">Explore the forest and defeat the warriors</div>
+
+<div id="start">
+<div id="card">
+<h1>JADE WINDS</h1>
+<p>Enter the Ancient Forest</p>
+<p>Explore the mountains, fight enemy warriors and master your attacks.</p>
+<p>Move with the left joystick. Use ATTACK and POWER to fight.</p>
+<button id="play">PLAY GAME</button>
+</div>
+</div>
+
 <script type="module">
 import * as THREE from 'three';
 
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x91c9df);
-scene.fog=new THREE.Fog(0x91c9df,35,105);
+scene.background=new THREE.Color(0x9ac9dc);
+scene.fog=new THREE.FogExp2(0xa8c8c8,0.008);
 
-const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,160);
-const renderer=new THREE.WebGLRenderer({antialias:true});
+const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,250);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.12;
 document.body.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xe0f4ff,0x3a5030,2));
-const sun=new THREE.DirectionalLight(0xffe7c4,2);
-sun.position.set(-15,25,12);scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xdaf3ff,0x35472b,2.1));
 
-function material(c){return new THREE.MeshStandardMaterial({color:c,roughness:.9})}
+const sun=new THREE.DirectionalLight(0xffe4b0,3);
+sun.position.set(-25,40,18);
+scene.add(sun);
 
-const floor=new THREE.Mesh(new THREE.PlaneGeometry(150,150),material(0x4f8048));
-floor.rotation.x=-Math.PI/2;floor.position.y=-.1;scene.add(floor);
+const fill=new THREE.DirectionalLight(0x86caff,.7);
+fill.position.set(20,12,-25);
+scene.add(fill);
 
-const path=new THREE.Mesh(new THREE.PlaneGeometry(7,100),material(0x99886a));
-path.rotation.x=-Math.PI/2;path.position.set(0,-.08,-20);scene.add(path);
+const mat=(color,roughness=.88,metalness=0)=>
+new THREE.MeshStandardMaterial({color,roughness,metalness});
 
-// Automatically create distant hills
-for(let i=0;i<18;i++){
- const hill=new THREE.Mesh(new THREE.SphereGeometry(1,12,9),material(i%2?0x628b68:0x739b76));
- hill.scale.set(8+Math.random()*8,3+Math.random()*4,7+Math.random()*8);
- hill.position.set((Math.random()-.5)*110,-1.5,-40-Math.random()*60);
- scene.add(hill);
+const green=mat(0x426f3b),darkGreen=mat(0x28583b);
+const trunkMat=mat(0x65452c),stoneMat=mat(0x777f7c);
+const goldMat=mat(0xd7b45e,.4,.5);
+
+const ground=new THREE.Mesh(
+new THREE.PlaneGeometry(220,220,1,1),
+mat(0x607f43)
+);
+ground.rotation.x=-Math.PI/2;
+ground.position.y=-.12;
+scene.add(ground);
+
+// Grass patches add texture to the ground.
+for(let i=0;i<350;i++){
+const x=(Math.random()-.5)*145;
+const z=(Math.random()-.5)*145;
+const blade=new THREE.Mesh(
+new THREE.ConeGeometry(.045,.35,3),
+mat(Math.random()>.5?0x72964c:0x456d39)
+);
+blade.position.set(x,.12,z);
+blade.rotation.z=(Math.random()-.5)*.35;
+scene.add(blade);
 }
 
-// Automatically create forest
+// Winding stone-and-earth path.
+const pathMat=mat(0x9b8966);
+for(let i=0;i<20;i++){
+const x=Math.sin(i*.34)*2.2;
+const z=15-i*4.5;
+const piece=new THREE.Mesh(
+new THREE.BoxGeometry(5.5,.06,4.7),
+pathMat
+);
+piece.position.set(x,-.045,z);
+piece.rotation.y=Math.sin(i*.3)*.12;
+scene.add(piece);
+}
+
+// Distant layered mountains.
+for(let i=0;i<32;i++){
+const mountain=new THREE.Mesh(
+new THREE.ConeGeometry(1,1,7),
+mat([0x668d83,0x769a8d,0x526f70][i%3])
+);
+const scale=10+Math.random()*15;
+mountain.scale.set(scale,scale*(1.3+Math.random()),scale);
+mountain.position.set(
+(i%2?1:-1)*(28+Math.random()*65),
+scale*.45-1,
+-45-Math.random()*90
+);
+scene.add(mountain);
+
+// Snow-tinted peak for a distant mountain.
+if(i%4===0){
+const peak=new THREE.Mesh(
+new THREE.ConeGeometry(scale*.19,scale*.45,7),
+mat(0xc9d8d2)
+);
+peak.position.set(mountain.position.x,
+mountain.position.y+scale*.62,
+mountain.position.z);
+scene.add(peak);
+}
+}
+
+// Forest trees with layered foliage.
+for(let i=0;i<125;i++){
+const x=(Math.random()-.5)*95;
+const z=(Math.random()-.5)*115;
+if(Math.abs(x)<6&&z<15&&z>-40)continue;
+
+const tree=new THREE.Group();
+const height=2.5+Math.random()*2.4;
+
+const trunk=new THREE.Mesh(
+new THREE.CylinderGeometry(.18,.38,height,7),
+trunkMat
+);
+trunk.position.y=height/2;
+tree.add(trunk);
+
+for(let layer=0;layer<3;layer++){
+const crown=new THREE.Mesh(
+new THREE.ConeGeometry(1.15-layer*.17,2.1,7),
+mat(layer===0?0x285b39:layer===1?0x367447:0x477e48)
+);
+crown.position.y=height*.64+layer*.82;
+tree.add(crown);
+}
+
+tree.position.set(x,0,z);
+tree.rotation.y=Math.random()*6;
+scene.add(tree);
+}
+
+// Rocks and small shrubs.
 for(let i=0;i<65;i++){
- const x=(Math.random()-.5)*85,z=(Math.random()-.5)*90;
- if(Math.abs(x)<5&&z<8&&z>-40)continue;
- const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.15,.24,1.7,7),material(0x65462b));
- trunk.position.set(x,.8,z);scene.add(trunk);
- const leaves=new THREE.Mesh(new THREE.ConeGeometry(1.1,3,7),material(0x2e7045));
- leaves.position.set(x,2.7,z);scene.add(leaves);
+const x=(Math.random()-.5)*100;
+const z=(Math.random()-.5)*110;
+if(Math.abs(x)<5&&z<15&&z>-35)continue;
+
+const rock=new THREE.Mesh(
+new THREE.DodecahedronGeometry(.35+Math.random()*.8,0),
+stoneMat
+);
+rock.position.set(x,.1,z);
+rock.scale.y=.5+Math.random()*.5;
+rock.rotation.set(Math.random(),Math.random(),Math.random());
+scene.add(rock);
 }
 
-// Build characters from 3D shapes, so external models aren't needed
+// Procedural stylized warrior models: no external character files.
 function createWarrior(color,enemy=false){
- const group=new THREE.Group();
- function part(geo,c,x,y,z){
-  const m=new THREE.Mesh(geo,material(c));m.position.set(x,y,z);group.add(m);return m;
- }
- part(new THREE.CapsuleGeometry(.34,.65,4,8),color,0,1.15,0);
- part(new THREE.SphereGeometry(.27,12,10),0xd5a77e,0,1.85,0);
- part(new THREE.SphereGeometry(.28,10,8),0x211b19,0,2.04,0);
- part(new THREE.BoxGeometry(.68,.13,.4),enemy?0xb84637:0xe0c254,0,.9,0);
- for(const s of [-1,1]){
-  part(new THREE.CapsuleGeometry(.13,.4,3,6),color,s*.43,1.25,0);
-  part(new THREE.CapsuleGeometry(.15,.4,3,6),0x29323c,s*.18,.4,0);
- }
- const sword=part(new THREE.BoxGeometry(.08,.72,.12),0xe4ebf0,.62,1.18,0);
- group.userData.sword=sword;
- group.userData.hp=100;
- group.userData.cool=0;
- return group;
+const root=new THREE.Group();
+const cloth=mat(color);
+const skin=mat(0xd5a27d);
+const black=mat(0x24252c);
+const armor=mat(enemy?0x533d35:0x285070,.5);
+const red=mat(0x9d342b);
+const parts=[];
+
+function part(geo,material,x,y,z,parent=root){
+const mesh=new THREE.Mesh(geo,material);
+mesh.position.set(x,y,z);
+parent.add(mesh);
+return mesh;
 }
 
-const player=createWarrior(0x2466b0);
-player.position.set(0,0,4);scene.add(player);
+const torso=new THREE.Group();
+torso.position.y=1.18;
+root.add(torso);
+parts.push(torso);
+
+part(new THREE.CapsuleGeometry(.34,.55,4,8),cloth,0,0,0,torso);
+
+part(new THREE.BoxGeometry(.64,.16,.48),armor,0,-.25,0,torso);
+
+// Shoulder armor.
+for(const side of [-1,1]){
+part(new THREE.SphereGeometry(.2,9,7),goldMat,side*.42,.13,0,torso);
+}
+
+// Head and tied hair.
+const head=new THREE.Group();
+head.position.set(0,.68,0);
+torso.add(head);
+parts.push(head);
+
+part(new THREE.SphereGeometry(.26,14,12),skin,0,0,0,head);
+part(new THREE.SphereGeometry(.28,12,8),black,0,.16,-.035,head);
+part(new THREE.BoxGeometry(.45,.08,.34),cloth,0,.25,0,head);
+
+// Belt.
+part(new THREE.BoxGeometry(.7,.12,.43),goldMat,0,-.36,0,torso);
+
+// Arms and legs with pivots for motion.
+const arms=[],legs=[];
+for(const side of [-1,1]){
+const arm=new THREE.Group();
+arm.position.set(side*.43,.02,0);
+torso.add(arm);
+part(new THREE.CapsuleGeometry(.12,.42,3,7),cloth,0,-.23,0,arm);
+arms.push(arm);
+
+const leg=new THREE.Group();
+leg.position.set(side*.19,-.42,0);
+root.add(leg);
+part(new THREE.CapsuleGeometry(.15,.48,3,7),black,0,-.23,0,leg);
+legs.push(leg);
+}
+
+// Staff/sword held in the right hand.
+const weapon=new THREE.Group();
+weapon.position.set(.63,-.33,-.1);
+weapon.rotation.z=-.15;
+torso.add(weapon);
+
+part(new THREE.CylinderGeometry(.045,.055,.95,8),enemy?red:0x76502c,0,-.14,0,weapon);
+part(new THREE.CylinderGeometry(.075,.075,.1,8),goldMat,0,-.58,0,weapon);
+part(new THREE.CylinderGeometry(.075,.075,.1,8),goldMat,0,.3,0,weapon);
+
+root.userData={torso,head,arms,legs,weapon,parts,hp:100,cool:0,phase:Math.random()*6,enemy};
+return root;
+}
+
+const player=createWarrior(0x2478b5);
+player.position.set(0,0,5);
+scene.add(player);
 
 const enemies=[];
+const enemyColors=[0xa93b30,0x76509b,0xa77c2f];
+
 for(let i=0;i<3;i++){
- const e=createWarrior([0xa63e35,0x80438b,0xa27432][i],true);
- e.position.set((i-1)*4,0,-5-i*5);
- scene.add(e);enemies.push(e);
+const enemy=createWarrior(enemyColors[i],true);
+enemy.position.set((i-1)*4,0,-5-i*6);
+scene.add(enemy);
+enemies.push(enemy);
 }
 
-let hp=100,kills=0,started=false,jumpV=0,grounded=true,attackCD=0,invulnerable=0;
+// Small glowing shrine.
+const shrine=new THREE.Group();
+const base=new THREE.Mesh(
+new THREE.CylinderGeometry(1.1,1.5,.45,8),
+mat(0x777e77,.5)
+);
+base.position.y=.2;
+shrine.add(base);
+
+const crystal=new THREE.Mesh(
+new THREE.OctahedronGeometry(.7),
+new THREE.MeshStandardMaterial({
+color:0x54f0cb,emissive:0x0c775a,emissiveIntensity:1.7,
+roughness:.25,metalness:.2
+})
+);
+crystal.position.y=1.35;
+shrine.add(crystal);
+shrine.position.set(8,0,-25);
+scene.add(shrine);
+
+// Soft ambient fireflies.
+const fireflies=[];
+const glowMat=new THREE.MeshBasicMaterial({color:0xb5ffd7});
+for(let i=0;i<22;i++){
+const light=new THREE.Mesh(
+new THREE.SphereGeometry(.055,6,6),glowMat
+);
+light.position.set(
+(Math.random()-.5)*32,
+1+Math.random()*5,
+-12-Math.random()*35
+);
+scene.add(light);
+fireflies.push(light);
+}
+
+let hp=100,kills=0,started=false;
+let jumpV=0,grounded=true,attackCD=0,invulnerable=0;
+let heavyCD=0,elapsed=0,walking=0;
+
 const hpEl=document.querySelector('#hp');
 const bar=document.querySelector('#bar');
 const killsEl=document.querySelector('#kills');
 const msg=document.querySelector('#msg');
 
 function updateHUD(){
- hpEl.textContent=Math.ceil(hp);
- bar.style.width=Math.max(0,hp)+'%';
- killsEl.textContent=kills;
+hpEl.textContent=Math.ceil(hp);
+bar.style.width=Math.max(0,hp)+'%';
+killsEl.textContent=kills;
+bar.style.background=hp<30?'#ff554b':'#55ed91';
 }
-function attack(){
- if(!started||attackCD>0||hp<=0)return;
- attackCD=.45;
- let hit=false;
- for(const e of enemies){
-  if(!e.visible)continue;
-  if(e.position.distanceTo(player.position)<2.6){
-   e.userData.hp-=35;hit=true;
-   if(e.userData.hp<=0){
-    e.visible=false;kills++;
-    msg.textContent='Warrior defeated!';
-   }
-  }
- }
- if(!hit)msg.textContent='Move closer to an enemy';
- updateHUD();
+
+function hitEnemies(power,range){
+let hit=false;
+for(const e of enemies){
+if(!e.visible)continue;
+const distance=e.position.distanceTo(player.position);
+if(distance<range){
+e.userData.hp-=power;
+hit=true;
+
+// Brief impact flash.
+e.traverse(o=>{
+if(o.isMesh&&o.material&&o.material.emissive){
+o.material.emissive.setHex(0x552211);
 }
-document.querySelector('#attack').addEventListener('pointerdown',e=>{e.preventDefault();attack()});
-document.querySelector('#jump').addEventListener('pointerdown',e=>{
- e.preventDefault();if(grounded&&started&&hp>0){jumpV=6.5;grounded=false}
 });
 
-// Touch joystick
+if(e.userData.hp<=0){
+e.visible=false;
+kills++;
+msg.textContent='Warrior defeated!';
+}else{
+msg.textContent=power>40?'Power strike!':'Clean hit!';
+}
+}
+}
+if(!hit)msg.textContent='Move closer to an enemy';
+updateHUD();
+}
+
+function attack(){
+if(!started||hp<=0||attackCD>0)return;
+attackCD=.42;
+player.userData.weapon.rotation.x=-.9;
+hitEnemies(25,3.1);
+}
+
+function heavyAttack(){
+if(!started||hp<=0||heavyCD>0)return;
+heavyCD=1.1;
+player.userData.weapon.rotation.x=-1.6;
+hitEnemies(48,3.7);
+}
+
+document.querySelector('#attack').addEventListener('pointerdown',e=>{
+e.preventDefault();attack();
+});
+document.querySelector('#heavy').addEventListener('pointerdown',e=>{
+e.preventDefault();heavyAttack();
+});
+document.querySelector('#jump').addEventListener('pointerdown',e=>{
+e.preventDefault();
+if(grounded&&started&&hp>0){
+jumpV=7;
+grounded=false;
+}
+});
+
+// Mobile joystick.
 const stick=document.querySelector('#stick');
 const knob=document.querySelector('#knob');
 let joy={x:0,y:0},pointer=null;
+
 function setJoy(e){
- const r=stick.getBoundingClientRect();
- let dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
- const len=Math.hypot(dx,dy),max=36;
- if(len>max){dx=dx/len*max;dy=dy/len*max}
- joy={x:dx/max,y:dy/max};
- knob.style.transform=`translate(${dx}px,${dy}px)`;
+const r=stick.getBoundingClientRect();
+let dx=e.clientX-(r.left+r.width/2);
+let dy=e.clientY-(r.top+r.height/2);
+const len=Math.hypot(dx,dy),max=36;
+if(len>max){dx=dx/len*max;dy=dy/len*max}
+joy={x:dx/max,y:dy/max};
+knob.style.transform=`translate(${dx}px,${dy}px)`;
 }
-function resetJoy(){joy={x:0,y:0};pointer=null;knob.style.transform='translate(0,0)'}
-stick.addEventListener('pointerdown',e=>{e.preventDefault();pointer=e.pointerId;stick.setPointerCapture(pointer);setJoy(e)});
-stick.addEventListener('pointermove',e=>{if(e.pointerId===pointer)setJoy(e)});
+function resetJoy(){
+joy={x:0,y:0};pointer=null;
+knob.style.transform='translate(0,0)';
+}
+stick.addEventListener('pointerdown',e=>{
+e.preventDefault();pointer=e.pointerId;
+stick.setPointerCapture(pointer);setJoy(e);
+});
+stick.addEventListener('pointermove',e=>{
+if(e.pointerId===pointer)setJoy(e);
+});
 stick.addEventListener('pointerup',resetJoy);
 stick.addEventListener('pointercancel',resetJoy);
 
-// Keyboard controls for desktop testing
 const keys={};
 addEventListener('keydown',e=>{
- keys[e.key.toLowerCase()]=true;
- if(e.code==='Space'&&grounded){jumpV=6.5;grounded=false}
- if(e.key.toLowerCase()==='f')attack();
+keys[e.key.toLowerCase()]=true;
+if(e.code==='Space'&&grounded&&started){
+jumpV=7;grounded=false;
+}
+if(e.key.toLowerCase()==='f')attack();
+if(e.key.toLowerCase()==='g')heavyAttack();
 });
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 
 document.querySelector('#play').addEventListener('click',()=>{
- started=true;document.querySelector('#start').style.display='none';
+started=true;
+document.querySelector('#start').style.display='none';
+msg.textContent='Defeat all three warriors!';
 });
 
 const clock=new THREE.Clock();
-const target=new THREE.Vector3(),cameraPosition=new THREE.Vector3();
+const target=new THREE.Vector3();
+const cameraPosition=new THREE.Vector3();
 
 function animate(){
- requestAnimationFrame(animate);
- const dt=Math.min(clock.getDelta(),.04);
+requestAnimationFrame(animate);
+const dt=Math.min(clock.getDelta(),.04);
+elapsed+=dt;
 
- if(started&&hp>0){
-  attackCD=Math.max(0,attackCD-dt);
-  invulnerable=Math.max(0,invulnerable-dt);
+crystal.rotation.y+=dt*.65;
+crystal.position.y=1.35+Math.sin(elapsed*2)*.12;
 
-  let x=joy.x,y=joy.y;
-  if(keys.a||keys.arrowleft)x-=1;
-  if(keys.d||keys.arrowright)x+=1;
-  if(keys.w||keys.arrowup)y-=1;
-  if(keys.s||keys.arrowdown)y+=1;
-  const len=Math.hypot(x,y);
-  if(len>1){x/=len;y/=len}
+fireflies.forEach((f,i)=>{
+f.position.y+=Math.sin(elapsed*1.8+i)*.0015;
+f.position.x+=Math.sin(elapsed+i)*.001;
+});
 
-  if(len>.08){
-   player.position.x+=x*5*dt;
-   player.position.z+=y*5*dt;
-   player.rotation.y=Math.atan2(-x,-y);
-  }
-  player.position.x=THREE.MathUtils.clamp(player.position.x,-40,40);
-  player.position.z=THREE.MathUtils.clamp(player.position.z,-45,30);
+if(started&&hp>0){
+attackCD=Math.max(0,attackCD-dt);
+heavyCD=Math.max(0,heavyCD-dt);
+invulnerable=Math.max(0,invulnerable-dt);
 
-  jumpV-=16*dt;player.position.y+=jumpV*dt;
-  if(player.position.y<=0){player.position.y=0;jumpV=0;grounded=true}
+let x=joy.x,y=joy.y;
+if(keys.a||keys.arrowleft)x-=1;
+if(keys.d||keys.arrowright)x+=1;
+if(keys.w||keys.arrowup)y-=1;
+if(keys.s||keys.arrowdown)y+=1;
 
-  for(const e of enemies){
-   if(!e.visible)continue;
-   const direction=new THREE.Vector3().subVectors(player.position,e.position);
-   direction.y=0;
-   const distance=direction.length();
-   if(distance>1.5&&distance<35){
-    direction.normalize();
-    e.position.addScaledVector(direction,1.25*dt);
-    e.rotation.y=Math.atan2(-direction.x,-direction.z);
-   }else if(distance<=1.6){
-    e.userData.cool-=dt;
-    if(e.userData.cool<=0&&invulnerable<=0){
-     hp=Math.max(0,hp-7);invulnerable=.7;e.userData.cool=1.2;
-     updateHUD();
-     msg.textContent=hp>0?'Enemy attacked you!':'Defeated — refresh to restart';
-    }
-   }
-  }
- }
+const len=Math.hypot(x,y);
+if(len>1){x/=len;y/=len}
 
- target.set(player.position.x,player.position.y+1.25,player.position.z);
- cameraPosition.set(player.position.x,player.position.y+4.2,player.position.z+7.8);
- camera.position.lerp(cameraPosition,1-Math.exp(-5*dt));
- camera.lookAt(target);
- renderer.render(scene,camera);
+if(len>.08){
+player.position.x+=x*5.3*dt;
+player.position.z+=y*5.3*dt;
+player.rotation.y=Math.atan2(-x,-y);
+walking+=dt*10;
+}else{
+walking+=dt*2;
+}
+
+player.position.x=THREE.MathUtils.clamp(player.position.x,-42,42);
+player.position.z=THREE.MathUtils.clamp(player.position.z,-48,35);
+
+jumpV-=17*dt;
+player.position.y+=jumpV*dt;
+if(player.position.y<=0){
+player.position.y=0;jumpV=0;grounded=true;
+}
+
+const moveAmount=len>.08?1:0;
+player.userData.legs[0].rotation.x=Math.sin(walking)*.65*moveAmount;
+player.userData.legs[1].rotation.x=-Math.sin(walking)*.65*moveAmount;
+player.userData.arms[0].rotation.x=-Math.sin(walking)*.4*moveAmount;
+player.userData.arms[1].rotation.x=Math.sin(walking)*.4*moveAmount;
+player.userData.torso.position.y=1.18+Math.sin(walking*2)*.035*moveAmount;
+
+for(const e of enemies){
+if(!e.visible)continue;
+e.userData.phase+=dt*4;
+
+const direction=new THREE.Vector3().subVectors(player.position,e.position);
+direction.y=0;
+const distance=direction.length();
+
+if(distance>1.65&&distance<38){
+direction.normalize();
+e.position.addScaledVector(direction,1.15*dt);
+e.rotation.y=Math.atan2(-direction.x,-direction.z);
+e.userData.legs[0].rotation.x=Math.sin(e.userData.phase)*.45;
+e.userData.legs[1].rotation.x=-Math.sin(e.userData.phase)*.45;
+}else if(distance<=1.8){
+e.userData.cool-=dt;
+if(e.userData.cool<=0&&invulnerable<=0){
+hp=Math.max(0,hp-8);
+invulnerable=.65;
+e.userData.cool=1.15;
+updateHUD();
+msg.textContent=hp>0?'You were hit!':'Defeated — refresh to restart';
+}
+}
+}
+}
+
+// Smooth third-person follow camera.
+target.set(player.position.x,player.position.y+1.45,player.position.z);
+cameraPosition.set(player.position.x,player.position.y+4.3,player.position.z+8.4);
+camera.position.lerp(cameraPosition,1-Math.exp(-4.5*dt));
+camera.lookAt(target);
+
+renderer.render(scene,camera);
 }
 
 addEventListener('resize',()=>{
- camera.aspect=innerWidth/innerHeight;
- camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
+camera.aspect=innerWidth/innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 });
-updateHUD();animate();
+
+updateHUD();
+animate();
 </script>
 </body>
 </html>
