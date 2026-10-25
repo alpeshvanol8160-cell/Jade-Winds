@@ -1,282 +1,253 @@
-
+ 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Jade Winds - Shadow Duel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxy Animation</title>
+
 <style>
-*{box-sizing:border-box;touch-action:none}
-body{margin:0;background:#111827;color:white;font-family:Arial;overflow:hidden}
-canvas{display:block;width:100vw;height:100dvh}
-#hud{position:absolute;top:12px;left:12px;right:12px;display:flex;gap:10px;align-items:center}
-.panel{flex:1;font-size:12px;font-weight:bold}
-.bar{height:13px;background:#333;border:1px solid #ddd;border-radius:10px;overflow:hidden;margin-top:5px}
-.fill{height:100%;width:100%;background:#51e28a}
-.enemy .fill{background:#f34450}
-#round{font-size:11px;color:#f5d58b;font-weight:bold}
-#message{position:absolute;top:25%;width:100%;text-align:center;font-size:32px;font-weight:bold;text-shadow:0 2px 5px black;pointer-events:none}
-.controls{position:absolute;bottom:18px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:end}
-.grid{display:grid;grid-template-columns:repeat(3,48px);gap:5px}
-.actions{display:grid;grid-template-columns:repeat(2,58px);gap:7px}
-button{height:52px;border:1px solid #b6c7dd;border-radius:14px;background:#27364b;color:white;font-weight:bold;font-size:12px;box-shadow:0 3px 0 #080d16}
-button:active{background:#b78536}
-.grid button{font-size:22px}
-#again{display:none;position:absolute;top:60%;left:50%;transform:translateX(-50%);background:#f2ca73;color:#20180b;padding:0 22px}
-@media(min-width:650px){.grid{grid-template-columns:repeat(3,60px)}.actions{grid-template-columns:repeat(2,70px)}button{height:60px}}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow: hidden;
+  background: #02010c;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.title {
+  position: fixed;
+  top: 9%;
+  width: 100%;
+  text-align: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+h1 {
+  font-size: clamp(30px, 8vw, 60px);
+  letter-spacing: 5px;
+  background: linear-gradient(
+    90deg, #55eaff, #c58aff, #ff7be5, #55eaff
+  );
+  background-size: 300%;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: glow 5s linear infinite;
+  text-shadow: 0 0 30px #754cff55;
+}
+
+p {
+  margin-top: 12px;
+  color: #c9c6ff;
+  letter-spacing: 3px;
+  font-size: 12px;
+}
+
+@keyframes glow {
+  to { background-position: 300%; }
+}
+
+.controls {
+  position: fixed;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  z-index: 3;
+}
+
+button {
+  padding: 12px 20px;
+  border: 1px solid #8b7bff;
+  border-radius: 30px;
+  color: white;
+  background: #211746aa;
+  font-size: 14px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+button:active {
+  background: #754cff;
+}
 </style>
 </head>
+
 <body>
-<canvas id="game"></canvas>
-<div id="hud">
- <div class="panel">JADE WARRIOR<div class="bar"><div id="hp" class="fill"></div></div></div>
- <div id="round">ROUND 1</div>
- <div class="panel enemy" style="text-align:right">SHADOW RIVAL<div class="bar"><div id="ehp" class="fill"></div></div></div>
+<canvas id="space"></canvas>
+
+<div class="title">
+  <h1>GALAXY</h1>
+  <p>EXPLORE THE INFINITE UNIVERSE</p>
 </div>
-<div id="message"></div>
-<button id="again">PLAY AGAIN</button>
+
 <div class="controls">
- <div class="grid">
-  <button data-key="left">◀</button>
-  <button id="jump">⬆ JUMP</button>
-  <button data-key="right">▶</button>
-  <button data-key="down">▼</button>
- </div>
- <div class="actions">
-  <button data-hit="punch">👊<br>PUNCH</button>
-  <button data-hit="kick">🦵<br>KICK</button>
-  <button data-hit="staff">🦯<br>STAFF</button>
-  <button data-key="block">🛡️<br>BLOCK</button>
- </div>
+  <button id="pause">⏸ Pause</button>
+  <button id="speed">⚡ Speed</button>
+  <button id="stars">✨ More Stars</button>
 </div>
+
 <script>
-const canvas=document.getElementById('game');
-const c=canvas.getContext('2d');
-const hp=document.getElementById('hp'),ehp=document.getElementById('ehp');
-const msg=document.getElementById('message');
-const again=document.getElementById('again');
-let W,H,D=1,G,over=false,last=0,combo=0,comboEnd=0;
-const keys={left:false,right:false,down:false,block:false};
+const canvas = document.getElementById("space");
+const ctx = canvas.getContext("2d");
 
-function resize(){
- D=Math.min(devicePixelRatio||1,2);
- W=innerWidth;H=innerHeight;G=H*.72;
- canvas.width=W*D;canvas.height=H*D;
- c.setTransform(D,0,0,D,0,0);
-}
-addEventListener('resize',resize);resize();
+let w, h, cx, cy;
+let particles = [];
+let starCount = 450;
+let paused = false;
+let speed = 1;
+let angle = 0;
 
-function make(x,enemy){
- return {x,y:G,vy:0,hp:100,face:enemy?-1:1,
- enemy,act:'idle',timer:0,cd:0,hit:false,block:false};
-}
-let p,e;
-function reset(){
- p=make(W*.27,false);e=make(W*.73,true);
- p.y=e.y=G;over=false;combo=0;
- msg.textContent='';again.style.display='none';
- Object.keys(keys).forEach(k=>keys[k]=false);
-}
-reset();
-
-function jump(){
- if(over||p.hp<=0)return;
- // Jump only when the player is on the ground.
- if(p.y>=G-1 && p.vy===0){
-  p.vy=-Math.min(650,H*1.1);
-  p.act='jump';p.timer=25;
- }
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  w = innerWidth;
+  h = innerHeight;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width = w + "px";
+  canvas.style.height = h + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  cx = w / 2;
+  cy = h / 2;
+  createStars();
 }
 
-function attack(f,type){
- if(over||f.hp<=0||f.cd>0)return;
- if(f.act!=='idle'&&f.act!=='walk'&&f.act!=='block')return;
- f.act=type;f.hit=false;
- f.timer=type==='punch'?22:type==='kick'?30:36;
- f.cd=type==='punch'?25:type==='kick'?34:42;
-}
-
-function hurt(target,damage){
- if(target.block&&target.y>=G-1)damage=2;
- target.hp=Math.max(0,target.hp-damage);
- if(target.hp<=0){
-  over=true;
-  msg.textContent=target.enemy?'VICTORY!':'DEFEAT!';
-  again.style.display='block';
- }
-}
-
-function updateF(f,dt){
- if(f.cd>0)f.cd-=dt*60;
- if(f.timer>0)f.timer-=dt*60;
- if(f.y<G||f.vy<0){
-  f.vy+=1500*dt;
-  f.y+=f.vy*dt;
-  if(f.y>=G){
-   f.y=G;f.vy=0;
-   if(f.act==='jump')f.act='idle';
+function createStars() {
+  particles = [];
+  for (let i = 0; i < starCount; i++) {
+    particles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.7 + 0.2,
+      a: Math.random(),
+      twinkle: Math.random() * 0.04 + 0.005
+    });
   }
- }
- if(f.timer<=0&&['punch','kick','staff','jump','hit'].includes(f.act))
-  f.act='idle';
- f.block=f===p?keys.block:f.act==='block';
 }
 
-function hitCheck(a,b){
- if(!['punch','kick','staff'].includes(a.act)||a.hit)return;
- const reach=a.act==='staff'?125:a.act==='kick'?90:68;
- if(Math.abs(a.x-b.x)<reach &&
-    Math.abs(a.y-b.y)<85 &&
-    Math.sign(b.x-a.x)===a.face){
-  a.hit=true;
-  hurt(b,a.act==='staff'?14:a.act==='kick'?12:8);
-  if(b.hp>0){b.act='hit';b.timer=12;}
-  if(a===p){combo++;comboEnd=performance.now()+1000;}
- }
+function background() {
+  const bg = ctx.createRadialGradient(
+    cx, cy, 0, cx, cy, Math.max(w, h) * 0.8
+  );
+  bg.addColorStop(0, "#17113c");
+  bg.addColorStop(0.45, "#09051d");
+  bg.addColorStop(1, "#010108");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
 }
 
-function update(dt){
- if(over)return;
- updateF(p,dt);updateF(e,dt);
- p.face=e.x>=p.x?1:-1;
- e.face=p.x>=e.x?1:-1;
- const speed=Math.min(240,W*.43);
+function drawGalaxy() {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(angle);
 
- if(keys.left)p.x-=speed*dt;
- if(keys.right)p.x+=speed*dt;
- p.x=Math.max(20,Math.min(W-20,p.x));
-
- if(keys.left||keys.right){
-  if(p.act==='idle')p.act='walk';
- }else if(p.act==='walk')p.act='idle';
-
- // Enemy follows the player and attacks at close range.
- let dist=Math.abs(p.x-e.x);
- if(e.act==='idle'||e.act==='walk'){
-  if(dist>105){
-   e.x+=(p.x>e.x?1:-1)*speed*.48*dt;
-   e.act='walk';
-  }else{
-   e.act='idle';
-   if(e.cd<=0&&Math.random()<.035)
-    attack(e,Math.random()<.5?'punch':'kick');
+  // Nebula glow
+  for (let i = 0; i < 5; i++) {
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 100 + i * 35);
+    g.addColorStop(0, "#000000");
+    g.addColorStop(0.2, "#4e2cff22");
+    g.addColorStop(0.55, "#e53bff12");
+    g.addColorStop(1, "#00d9ff00");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, 0, 100 + i * 35, 0, Math.PI * 2);
+    ctx.fill();
   }
- }
- if(e.act==='walk'&&dist<=105)e.act='idle';
- e.x=Math.max(20,Math.min(W-20,e.x));
- hitCheck(p,e);hitCheck(e,p);
+
+  // Spiral galaxy arms
+  for (let arm = 0; arm < 4; arm++) {
+    for (let i = 0; i < 1000; i++) {
+      const t = i / 1000;
+      const radius = 12 + t * Math.min(w, h) * 0.43;
+      const a = t * 8 + arm * Math.PI / 2;
+      const spread = (Math.random() - 0.5) * 0.025;
+      const x = Math.cos(a + spread) * radius;
+      const y = Math.sin(a + spread) * radius * 0.48;
+
+      ctx.fillStyle = i % 3 === 0
+        ? "rgba(91,220,255,0.7)"
+        : i % 3 === 1
+        ? "rgba(218,128,255,0.65)"
+        : "rgba(255,255,255,0.7)";
+
+      ctx.beginPath();
+      ctx.arc(x, y, Math.random() * 1.5 + 0.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Bright galactic core
+  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, 55);
+  core.addColorStop(0, "#ffffff");
+  core.addColorStop(0.08, "#fff4c4");
+  core.addColorStop(0.25, "#c99aff");
+  core.addColorStop(0.55, "#744aff55");
+  core.addColorStop(1, "#744aff00");
+  ctx.fillStyle = core;
+  ctx.beginPath();
+  ctx.arc(0, 0, 55, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
 }
 
-function poly(points,color){
- c.fillStyle=color;c.beginPath();
- c.moveTo(points[0][0],points[0][1]);
- points.slice(1).forEach(q=>c.lineTo(q[0],q[1]));
- c.closePath();c.fill();
+function drawStars() {
+  for (const s of particles) {
+    s.a += s.twinkle;
+    const opacity = 0.3 + Math.abs(Math.sin(s.a)) * 0.7;
+    ctx.fillStyle = `rgba(220,235,255,${opacity})`;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
-function background(){
- let g=c.createLinearGradient(0,0,0,H);
- g.addColorStop(0,'#101a30');g.addColorStop(1,'#8b7163');
- c.fillStyle=g;c.fillRect(0,0,W,H);
- c.fillStyle='#f5dfaa';c.beginPath();
- c.arc(W*.78,H*.18,Math.min(W,H)*.06,0,Math.PI*2);c.fill();
- poly([[0,G],[0,H*.5],[W*.2,H*.3],[W*.4,H*.55],
- [W*.62,H*.32],[W*.82,H*.5],[W,H*.36],[W,G]],'#354256');
- poly([[0,G],[W*.15,H*.57],[W*.35,H*.44],
- [W*.55,H*.6],[W*.8,H*.43],[W,G]],'#202c3d');
- c.fillStyle='#111722';c.fillRect(0,G,W,H-G);
+function animate() {
+  if (!paused) {
+    background();
+    drawStars();
+    drawGalaxy();
+    angle += 0.002 * speed;
+  }
+  requestAnimationFrame(animate);
 }
 
-function draw(f){
- c.save();c.translate(f.x,f.y);c.scale(f.face,1);
- let color=f.enemy?'#080b12':'#050b10';
- c.fillStyle=color;c.strokeStyle=color;c.lineWidth=10;c.lineCap='round';
- // Head and body silhouette
- c.beginPath();c.arc(0,-104,11,0,Math.PI*2);c.fill();
- c.beginPath();c.ellipse(0,-72,12,24,0,0,Math.PI*2);c.fill();
- // Arms: extended during punch
- c.beginPath();
- if(f.act==='punch'){
-  c.moveTo(0,-83);c.lineTo(20,-84);c.lineTo(40,-84);
- }else{
-  c.moveTo(0,-83);c.lineTo(14,-72);c.lineTo(21,-60);
- }
- c.stroke();
- // Legs: kick extends forward
- c.beginPath();
- if(f.act==='kick'){
-  c.moveTo(0,-54);c.lineTo(16,-33);c.lineTo(37,-30);
-  c.moveTo(0,-54);c.lineTo(-13,-28);c.lineTo(-20,-4);
- }else{
-  c.moveTo(-3,-54);c.lineTo(-13,-30);c.lineTo(-22,-4);
-  c.moveTo(3,-54);c.lineTo(14,-30);c.lineTo(18,-4);
- }
- c.stroke();
- // Staff attack
- if(f.act==='staff'||f===p){
-  c.strokeStyle='#d3aa65';c.lineWidth=5;c.beginPath();
-  c.moveTo(12,-57);c.lineTo(75,-115);c.stroke();
- }
- // Coloured scarf
- c.strokeStyle=f.enemy?'#d34a52':'#37c4b2';c.lineWidth=4;
- c.beginPath();c.moveTo(-4,-97);c.lineTo(-22,-88);c.lineTo(-29,-94);c.stroke();
- // Ground shadow
- c.restore();
-}
+document.getElementById("pause").onclick = function() {
+  paused = !paused;
+  this.textContent = paused ? "▶ Play" : "⏸ Pause";
+};
 
-function render(){
- c.setTransform(D,0,0,D,0,0);c.clearRect(0,0,W,H);
- background();draw(p);draw(e);
- hp.style.width=p.hp+'%';ehp.style.width=e.hp+'%';
- if(!over)msg.textContent=combo>1&&performance.now()<comboEnd?combo+' HIT COMBO':'';
-}
+document.getElementById("speed").onclick = function() {
+  speed = speed === 1 ? 3 : speed === 3 ? 6 : 1;
+  this.textContent = "⚡ Speed " + speed + "x";
+};
 
-function loop(t){
- const dt=Math.min((t-last)/1000||0,.033);last=t;
- update(dt);render();requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
+document.getElementById("stars").onclick = function() {
+  starCount = starCount === 450 ? 1000 : 450;
+  createStars();
+  this.textContent = starCount === 450
+    ? "✨ More Stars" : "✨ Fewer Stars";
+};
 
-// Touch buttons use pointer events for Android and desktop.
-document.querySelectorAll('[data-key]').forEach(btn=>{
- const k=btn.dataset.key;
- const down=ev=>{
-  ev.preventDefault();keys[k]=true;btn.setPointerCapture?.(ev.pointerId);
- };
- const up=ev=>{ev.preventDefault();keys[k]=false;};
- btn.addEventListener('pointerdown',down);
- btn.addEventListener('pointerup',up);
- btn.addEventListener('pointercancel',up);
- btn.addEventListener('lostpointercapture',up);
-});
-document.getElementById('jump').addEventListener('pointerdown',ev=>{
- ev.preventDefault();jump();
-});
-document.querySelectorAll('[data-hit]').forEach(btn=>{
- btn.addEventListener('pointerdown',ev=>{
-  ev.preventDefault();attack(p,btn.dataset.hit);
- });
-});
-addEventListener('keydown',ev=>{
- const k=ev.key.toLowerCase();
- if(k==='a'||k==='arrowleft')keys.left=true;
- if(k==='d'||k==='arrowright')keys.right=true;
- if(k==='s'||k==='arrowdown')keys.down=true;
- if(k==='w'||k==='arrowup'||k===' ')jump();
- if(k==='j')attack(p,'punch');
- if(k==='k')attack(p,'kick');
- if(k==='l')attack(p,'staff');
- if(k==='shift')keys.block=true;
-});
-addEventListener('keyup',ev=>{
- const k=ev.key.toLowerCase();
- if(k==='a'||k==='arrowleft')keys.left=false;
- if(k==='d'||k==='arrowright')keys.right=false;
- if(k==='s'||k==='arrowdown')keys.down=false;
- if(k==='shift')keys.block=false;
-});
-again.addEventListener('click',reset);
+window.addEventListener("resize", resize);
+resize();
+animate();
 </script>
 </body>
 </html>
- 
