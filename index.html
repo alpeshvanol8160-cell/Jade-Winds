@@ -4,54 +4,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Jade Winds | Fantasy Combat</title>
-
+<title>Jade Winds - Warrior Edition</title>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.module.js"}}
 </script>
-
 <style>
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:#91b9c8;color:white;font-family:Arial;touch-action:none}
+body{margin:0;overflow:hidden;background:#9bbfc9;color:white;font-family:Arial;touch-action:none}
 canvas{display:block}
-#hud{position:fixed;top:12px;left:12px;z-index:2;background:#101b24dd;border:1px solid #ffffff40;padding:12px;border-radius:12px;font-size:13px;min-width:155px}
-#health{height:9px;background:#572626;border-radius:8px;overflow:hidden;margin-top:5px}
-#bar{height:100%;width:100%;background:#55ed91}
-#stick{position:fixed;bottom:22px;left:22px;width:112px;height:112px;border:2px solid #ffffff90;background:#ffffff25;border-radius:50%;z-index:3;touch-action:none}
-#knob{position:absolute;width:44px;height:44px;left:32px;top:32px;background:#ffffffd0;border-radius:50%}
-.btn{position:fixed;z-index:3;border:2px solid #ffffffa0;border-radius:50%;color:white;font-weight:bold;touch-action:none}
-#attack{bottom:25px;right:20px;width:78px;height:78px;background:#b83c35}
-#jump{bottom:112px;right:91px;width:58px;height:58px;background:#247da8}
-#heavy{bottom:112px;right:20px;width:58px;height:58px;background:#9b6a27}
-#msg{position:fixed;bottom:160px;left:50%;transform:translateX(-50%);z-index:2;background:#101820bb;padding:8px 12px;border-radius:15px;font-size:12px;white-space:nowrap}
-#start{position:fixed;inset:0;background:linear-gradient(#102438bb,#08131deF);z-index:5;display:grid;place-items:center;text-align:center;padding:22px}
-#card{max-width:350px;background:#162b39ee;padding:25px;border-radius:20px;border:1px solid #b8e8d480;box-shadow:0 12px 50px #0008}
-#card h1{color:#a8f0ce;letter-spacing:3px}
-#play{background:#61e7a0;border:0;padding:14px 30px;border-radius:10px;font-weight:bold;font-size:16px}
+#hud{position:fixed;top:12px;left:10px;z-index:2;background:#101a25df;padding:12px;border:1px solid #9de7cf70;border-radius:12px;font-size:13px}
+#bar{width:150px;height:8px;background:#552525;border-radius:8px;overflow:hidden;margin:5px 0}
+#hpbar{width:100%;height:100%;background:#5bf09a}
+#stick{position:fixed;z-index:3;bottom:22px;left:20px;width:112px;height:112px;border:2px solid #ffffff90;border-radius:50%;background:#ffffff25;touch-action:none}
+#knob{position:absolute;width:44px;height:44px;left:32px;top:32px;border-radius:50%;background:#ffffffd9}
+.btn{position:fixed;z-index:3;border:2px solid #ffffffaa;border-radius:50%;color:white;font-size:11px;font-weight:bold;touch-action:none}
+#attack{right:20px;bottom:25px;width:76px;height:76px;background:#a82e38}
+#power{right:20px;bottom:112px;width:58px;height:58px;background:#976322}
+#jump{right:88px;bottom:112px;width:58px;height:58px;background:#247da8}
+#message{position:fixed;bottom:155px;left:50%;transform:translateX(-50%);background:#101820cc;padding:8px 12px;border-radius:12px;font-size:12px;white-space:nowrap;z-index:2}
+#intro{position:fixed;inset:0;z-index:5;display:grid;place-items:center;text-align:center;background:linear-gradient(#0c2638bb,#08131df2);padding:20px}
+#panel{max-width:340px;background:#152b39f5;border:1px solid #9de7cf80;border-radius:20px;padding:25px}
+h1{letter-spacing:3px;color:#a9f1d1}
+button{cursor:pointer}
+#play{background:#5ce3a0;border:0;padding:13px 26px;border-radius:9px;font-weight:bold}
 </style>
 </head>
 <body>
 <div id="hud">
-<b style="color:#a8f0ce;letter-spacing:2px">JADE WINDS</b><br>
-HP: <span id="hp">100</span>/100
-<div id="health"><div id="bar"></div></div>
+<b style="color:#a9f1d1;letter-spacing:2px">JADE WINDS</b><br>
+Warrior HP: <span id="hp">100</span>/100
+<div id="bar"><div id="hpbar"></div></div>
 Defeated: <span id="kills">0</span>/3
-<div style="margin-top:5px">Ancient Forest</div>
 </div>
 
 <div id="stick"><div id="knob"></div></div>
-<button id="jump" class="btn">JUMP</button>
-<button id="attack" class="btn">ATTACK</button>
-<button id="heavy" class="btn">POWER</button>
-<div id="msg">Explore the forest and defeat the warriors</div>
+<button class="btn" id="attack">ATTACK</button>
+<button class="btn" id="power">POWER</button>
+<button class="btn" id="jump">JUMP</button>
+<div id="message">Defeat the enemy warriors!</div>
 
-<div id="start">
-<div id="card">
+<div id="intro">
+<div id="panel">
 <h1>JADE WINDS</h1>
-<p>Enter the Ancient Forest</p>
-<p>Explore the mountains, fight enemy warriors and master your attacks.</p>
-<p>Move with the left joystick. Use ATTACK and POWER to fight.</p>
-<button id="play">PLAY GAME</button>
+<p>WARRIOR EDITION</p>
+<p>Explore the ancient forest, jump, move and fight enemy warriors.</p>
+<p>Mobile: joystick + action buttons<br>PC: WASD / arrows, Space, F, G</p>
+<button id="play">ENTER THE FOREST</button>
 </div>
 </div>
 
@@ -59,484 +57,435 @@ Defeated: <span id="kills">0</span>/3
 import * as THREE from 'three';
 
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x9ac9dc);
-scene.fog=new THREE.FogExp2(0xa8c8c8,0.008);
+scene.background=new THREE.Color(0x9fc8dc);
+scene.fog=new THREE.Fog(0xa6c9c8,45,135);
 
-const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,250);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
+const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,200);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.12;
+renderer.toneMappingExposure=1.1;
 document.body.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xdaf3ff,0x35472b,2.1));
-
-const sun=new THREE.DirectionalLight(0xffe4b0,3);
-sun.position.set(-25,40,18);
+scene.add(new THREE.HemisphereLight(0xe0f5ff,0x3e4a2a,2));
+const sun=new THREE.DirectionalLight(0xffe1ac,3);
+sun.position.set(-25,40,25);
 scene.add(sun);
+const rim=new THREE.DirectionalLight(0x80caff,1.2);
+rim.position.set(20,12,-20);
+scene.add(rim);
 
-const fill=new THREE.DirectionalLight(0x86caff,.7);
-fill.position.set(20,12,-25);
-scene.add(fill);
+const material=(c,r=.75,m=0)=>new THREE.MeshStandardMaterial({
+ color:c,roughness:r,metalness:m
+});
+const skin=material(0xb97850);
+const dark=material(0x20232d);
+const gold=material(0xd9b45e,.35,.65);
+const jade=material(0x207a66,.55,.15);
+const leather=material(0x64402b);
+const groundMat=material(0x597d42);
+const stone=material(0x7c817c);
 
-const mat=(color,roughness=.88,metalness=0)=>
-new THREE.MeshStandardMaterial({color,roughness,metalness});
-
-const green=mat(0x426f3b),darkGreen=mat(0x28583b);
-const trunkMat=mat(0x65452c),stoneMat=mat(0x777f7c);
-const goldMat=mat(0xd7b45e,.4,.5);
-
-const ground=new THREE.Mesh(
-new THREE.PlaneGeometry(220,220,1,1),
-mat(0x607f43)
-);
-ground.rotation.x=-Math.PI/2;
-ground.position.y=-.12;
-scene.add(ground);
-
-// Grass patches add texture to the ground.
-for(let i=0;i<350;i++){
-const x=(Math.random()-.5)*145;
-const z=(Math.random()-.5)*145;
-const blade=new THREE.Mesh(
-new THREE.ConeGeometry(.045,.35,3),
-mat(Math.random()>.5?0x72964c:0x456d39)
-);
-blade.position.set(x,.12,z);
-blade.rotation.z=(Math.random()-.5)*.35;
-scene.add(blade);
+function mesh(parent,geo,mat,x=0,y=0,z=0){
+ const o=new THREE.Mesh(geo,mat);
+ o.position.set(x,y,z);
+ parent.add(o);
+ return o;
 }
 
-// Winding stone-and-earth path.
-const pathMat=mat(0x9b8966);
-for(let i=0;i<20;i++){
-const x=Math.sin(i*.34)*2.2;
-const z=15-i*4.5;
-const piece=new THREE.Mesh(
-new THREE.BoxGeometry(5.5,.06,4.7),
-pathMat
-);
-piece.position.set(x,-.045,z);
-piece.rotation.y=Math.sin(i*.3)*.12;
-scene.add(piece);
+// Ground and forest.
+const floor=mesh(scene,new THREE.PlaneGeometry(180,180),groundMat,0,-.13,0);
+floor.rotation.x=-Math.PI/2;
+
+for(let i=0;i<95;i++){
+ const x=(Math.random()-.5)*90;
+ const z=(Math.random()-.5)*105;
+ if(Math.abs(x)<5&&z<14&&z>-30)continue;
+ const tree=new THREE.Group();
+ const h=2.5+Math.random()*2;
+ mesh(tree,new THREE.CylinderGeometry(.15,.32,h,7),leather,0,h/2,0);
+ for(let j=0;j<3;j++)
+  mesh(tree,new THREE.ConeGeometry(1.3-j*.18,1.8,7),
+   material([0x245539,0x347348,0x477f49][j]),0,h*.55+j*.72,0);
+ tree.position.set(x,0,z);
+ scene.add(tree);
 }
 
-// Distant layered mountains.
-for(let i=0;i<32;i++){
-const mountain=new THREE.Mesh(
-new THREE.ConeGeometry(1,1,7),
-mat([0x668d83,0x769a8d,0x526f70][i%3])
-);
-const scale=10+Math.random()*15;
-mountain.scale.set(scale,scale*(1.3+Math.random()),scale);
-mountain.position.set(
-(i%2?1:-1)*(28+Math.random()*65),
-scale*.45-1,
--45-Math.random()*90
-);
-scene.add(mountain);
-
-// Snow-tinted peak for a distant mountain.
-if(i%4===0){
-const peak=new THREE.Mesh(
-new THREE.ConeGeometry(scale*.19,scale*.45,7),
-mat(0xc9d8d2)
-);
-peak.position.set(mountain.position.x,
-mountain.position.y+scale*.62,
-mountain.position.z);
-scene.add(peak);
+for(let i=0;i<24;i++){
+ const h=9+Math.random()*13;
+ const mountain=mesh(scene,new THREE.ConeGeometry(h*.8,h,7),
+  material(i%2?0x607e79:0x718e87), (Math.random()-.5)*120,h*.38,-45-Math.random()*55);
+ mountain.scale.z=1.4;
 }
+for(let i=0;i<35;i++){
+ const rock=mesh(scene,new THREE.DodecahedronGeometry(.4+Math.random()*.7),
+  stone,(Math.random()-.5)*70,.1,(Math.random()-.5)*75);
+ rock.scale.y=.65;
 }
 
-// Forest trees with layered foliage.
-for(let i=0;i<125;i++){
-const x=(Math.random()-.5)*95;
-const z=(Math.random()-.5)*115;
-if(Math.abs(x)<6&&z<15&&z>-40)continue;
+// Detailed stylized humanoid warrior with articulated joints.
+function makeWarrior(isEnemy=false,color=0x176f65){
+ const root=new THREE.Group();
+ const outfit=material(color,.65);
+ const armor=material(isEnemy?0x633b35:0x25495c,.4,.25);
+ const cloth=material(isEnemy?0x522c2a:0x173b36);
+ const hair=material(isEnemy?0x241c1b:0x171c25);
+ const bright=material(isEnemy?0xb84636:0x38c5a0,.35,.25);
+ const joints={};
 
-const tree=new THREE.Group();
-const height=2.5+Math.random()*2.4;
+ // Boots and articulated legs.
+ joints.legs=[];
+ for(const side of [-1,1]){
+  const leg=new THREE.Group();
+  leg.position.set(side*.19,.76,0);
+  root.add(leg);
+  mesh(leg,new THREE.CapsuleGeometry(.14,.38,4,8),outfit,0,-.19,0);
+  mesh(leg,new THREE.SphereGeometry(.145,10,8),armor,0,-.39,0);
+  mesh(leg,new THREE.BoxGeometry(.29,.15,.39),dark,0,-.48,-.07);
+  mesh(leg,new THREE.BoxGeometry(.30,.08,.12),gold,0,-.35,.08);
+  joints.legs.push(leg);
+ }
 
-const trunk=new THREE.Mesh(
-new THREE.CylinderGeometry(.18,.38,height,7),
-trunkMat
-);
-trunk.position.y=height/2;
-tree.add(trunk);
+ // Torso pivot makes the body lean during movement.
+ const body=new THREE.Group();
+ body.position.y=1.28;
+ root.add(body);
+ joints.body=body;
 
-for(let layer=0;layer<3;layer++){
-const crown=new THREE.Mesh(
-new THREE.ConeGeometry(1.15-layer*.17,2.1,7),
-mat(layer===0?0x285b39:layer===1?0x367447:0x477e48)
-);
-crown.position.y=height*.64+layer*.82;
-tree.add(crown);
+ mesh(body,new THREE.CapsuleGeometry(.32,.48,5,10),outfit);
+ mesh(body,new THREE.BoxGeometry(.66,.22,.43),armor,0,-.20,0);
+ mesh(body,new THREE.BoxGeometry(.70,.10,.46),gold,0,-.34,0);
+ mesh(body,new THREE.BoxGeometry(.72,.09,.47),leather,0,-.43,0);
+
+ // Layered chest plates.
+ for(let i=0;i<3;i++){
+  const plate=mesh(body,new THREE.BoxGeometry(.49,.13,.09),armor,0,.13-i*.16,.25);
+  plate.rotation.x=-.12;
+ }
+ mesh(body,new THREE.SphereGeometry(.105,12,10),bright,0,.10,.32);
+
+ // Shoulder guards.
+ for(const side of [-1,1]){
+  const shoulder=mesh(body,new THREE.SphereGeometry(.21,12,10),armor,side*.42,.24,0);
+  shoulder.scale.set(1,.72,1);
+  mesh(body,new THREE.BoxGeometry(.17,.09,.35),gold,side*.43,.14,0);
+ }
+
+ // Neck.
+ mesh(body,new THREE.CylinderGeometry(.10,.12,.18,10),skin,0,.48,0);
+
+ // Head with face, ears, brows, eyes, nose and beard.
+ const head=new THREE.Group();
+ head.position.set(0,.69,0);
+ body.add(head);
+ joints.head=head;
+
+ mesh(head,new THREE.SphereGeometry(.245,16,14),skin,0,0,0);
+ for(const side of [-1,1]){
+  mesh(head,new THREE.SphereGeometry(.06,8,8),skin,side*.24,0,0);
+  mesh(head,new THREE.SphereGeometry(.035,8,8),dark,side*.085,.045,.215);
+  mesh(head,new THREE.BoxGeometry(.085,.025,.025),hair,side*.085,.105,.22);
+ }
+ mesh(head,new THREE.ConeGeometry(.055,.14,7),skin,0,-.045,.235);
+ mesh(head,new THREE.SphereGeometry(.14,10,8),hair,0,-.16,.09);
+
+ // Hair cap and long tied hair.
+ const cap=mesh(head,new THREE.SphereGeometry(.26,12,8),hair,0,.13,-.025);
+ cap.scale.set(1,.55,1);
+ mesh(head,new THREE.ConeGeometry(.09,.36,8),hair,0,.37,-.05);
+ const pony=mesh(head,new THREE.CapsuleGeometry(.075,.44,4,7),hair,0,.10,-.28);
+ pony.rotation.x=-.65;
+
+ // Headband.
+ mesh(head,new THREE.TorusGeometry(.232,.035,7,18),gold,0,.10,0);
+
+ // Arms with elbow joints and forearm guards.
+ joints.arms=[];
+ for(const side of [-1,1]){
+  const arm=new THREE.Group();
+  arm.position.set(side*.43,.27,0);
+  body.add(arm);
+  mesh(arm,new THREE.CapsuleGeometry(.115,.29,4,8),outfit,0,-.18,0);
+  mesh(arm,new THREE.SphereGeometry(.125,10,8),armor,0,-.38,0);
+
+  const forearm=new THREE.Group();
+  forearm.position.y=-.39;
+  arm.add(forearm);
+  mesh(forearm,new THREE.CapsuleGeometry(.095,.25,4,8),skin,0,-.13,0);
+  const guard=mesh(forearm,new THREE.BoxGeometry(.22,.20,.18),armor,0,-.16,.06);
+  guard.rotation.z=side*.1;
+  mesh(forearm,new THREE.TorusGeometry(.11,.025,6,12),gold,0,-.27,0);
+  mesh(forearm,new THREE.SphereGeometry(.105,10,8),skin,0,-.31,0);
+  joints.arms.push({arm,forearm});
+ }
+
+ // Cloth panels hanging from the belt.
+ for(const side of [-1,1]){
+  const panel=mesh(body,new THREE.BoxGeometry(.21,.45,.07),cloth,side*.21,-.62,.04);
+  panel.rotation.z=side*.12;
+  mesh(body,new THREE.BoxGeometry(.20,.07,.09),gold,side*.21,-.40,.07);
+ }
+
+ // Staff in the right hand, with metallic fittings.
+ const weapon=new THREE.Group();
+ weapon.position.set(.53,-.61,.03);
+ weapon.rotation.z=-.18;
+ body.add(weapon);
+ mesh(weapon,new THREE.CylinderGeometry(.035,.05,1.35,9),
+  material(0x80542e,.4),0,-.13,0);
+ for(const y of [-.72,.46]){
+  mesh(weapon,new THREE.CylinderGeometry(.065,.065,.09,10),gold,0,y,0);
+ }
+ mesh(weapon,new THREE.ConeGeometry(.065,.18,8),gold,0,.60,0);
+ joints.weapon=weapon;
+
+ root.userData={
+  joints,hp:100,enemy:isEnemy,attackTimer:0,phase:Math.random()*6
+ };
+ return root;
 }
 
-tree.position.set(x,0,z);
-tree.rotation.y=Math.random()*6;
-scene.add(tree);
-}
-
-// Rocks and small shrubs.
-for(let i=0;i<65;i++){
-const x=(Math.random()-.5)*100;
-const z=(Math.random()-.5)*110;
-if(Math.abs(x)<5&&z<15&&z>-35)continue;
-
-const rock=new THREE.Mesh(
-new THREE.DodecahedronGeometry(.35+Math.random()*.8,0),
-stoneMat
-);
-rock.position.set(x,.1,z);
-rock.scale.y=.5+Math.random()*.5;
-rock.rotation.set(Math.random(),Math.random(),Math.random());
-scene.add(rock);
-}
-
-// Procedural stylized warrior models: no external character files.
-function createWarrior(color,enemy=false){
-const root=new THREE.Group();
-const cloth=mat(color);
-const skin=mat(0xd5a27d);
-const black=mat(0x24252c);
-const armor=mat(enemy?0x533d35:0x285070,.5);
-const red=mat(0x9d342b);
-const parts=[];
-
-function part(geo,material,x,y,z,parent=root){
-const mesh=new THREE.Mesh(geo,material);
-mesh.position.set(x,y,z);
-parent.add(mesh);
-return mesh;
-}
-
-const torso=new THREE.Group();
-torso.position.y=1.18;
-root.add(torso);
-parts.push(torso);
-
-part(new THREE.CapsuleGeometry(.34,.55,4,8),cloth,0,0,0,torso);
-
-part(new THREE.BoxGeometry(.64,.16,.48),armor,0,-.25,0,torso);
-
-// Shoulder armor.
-for(const side of [-1,1]){
-part(new THREE.SphereGeometry(.2,9,7),goldMat,side*.42,.13,0,torso);
-}
-
-// Head and tied hair.
-const head=new THREE.Group();
-head.position.set(0,.68,0);
-torso.add(head);
-parts.push(head);
-
-part(new THREE.SphereGeometry(.26,14,12),skin,0,0,0,head);
-part(new THREE.SphereGeometry(.28,12,8),black,0,.16,-.035,head);
-part(new THREE.BoxGeometry(.45,.08,.34),cloth,0,.25,0,head);
-
-// Belt.
-part(new THREE.BoxGeometry(.7,.12,.43),goldMat,0,-.36,0,torso);
-
-// Arms and legs with pivots for motion.
-const arms=[],legs=[];
-for(const side of [-1,1]){
-const arm=new THREE.Group();
-arm.position.set(side*.43,.02,0);
-torso.add(arm);
-part(new THREE.CapsuleGeometry(.12,.42,3,7),cloth,0,-.23,0,arm);
-arms.push(arm);
-
-const leg=new THREE.Group();
-leg.position.set(side*.19,-.42,0);
-root.add(leg);
-part(new THREE.CapsuleGeometry(.15,.48,3,7),black,0,-.23,0,leg);
-legs.push(leg);
-}
-
-// Staff/sword held in the right hand.
-const weapon=new THREE.Group();
-weapon.position.set(.63,-.33,-.1);
-weapon.rotation.z=-.15;
-torso.add(weapon);
-
-part(new THREE.CylinderGeometry(.045,.055,.95,8),enemy?red:0x76502c,0,-.14,0,weapon);
-part(new THREE.CylinderGeometry(.075,.075,.1,8),goldMat,0,-.58,0,weapon);
-part(new THREE.CylinderGeometry(.075,.075,.1,8),goldMat,0,.3,0,weapon);
-
-root.userData={torso,head,arms,legs,weapon,parts,hp:100,cool:0,phase:Math.random()*6,enemy};
-return root;
-}
-
-const player=createWarrior(0x2478b5);
+const player=makeWarrior(false,0x187a65);
 player.position.set(0,0,5);
 scene.add(player);
 
 const enemies=[];
-const enemyColors=[0xa93b30,0x76509b,0xa77c2f];
-
+const enemyColors=[0x80372e,0x55417e,0x92702e];
 for(let i=0;i<3;i++){
-const enemy=createWarrior(enemyColors[i],true);
-enemy.position.set((i-1)*4,0,-5-i*6);
-scene.add(enemy);
-enemies.push(enemy);
+ const e=makeWarrior(true,enemyColors[i]);
+ e.position.set((i-1)*4,0,-5-i*6);
+ scene.add(e);
+ enemies.push(e);
 }
 
-// Small glowing shrine.
+// Ancient jade crystal shrine.
 const shrine=new THREE.Group();
-const base=new THREE.Mesh(
-new THREE.CylinderGeometry(1.1,1.5,.45,8),
-mat(0x777e77,.5)
-);
-base.position.y=.2;
-shrine.add(base);
-
-const crystal=new THREE.Mesh(
-new THREE.OctahedronGeometry(.7),
-new THREE.MeshStandardMaterial({
-color:0x54f0cb,emissive:0x0c775a,emissiveIntensity:1.7,
-roughness:.25,metalness:.2
-})
-);
-crystal.position.y=1.35;
-shrine.add(crystal);
-shrine.position.set(8,0,-25);
+mesh(shrine,new THREE.CylinderGeometry(1.2,1.5,.45,8),
+ material(0x787f79),0,.2,0);
+const crystal=mesh(shrine,new THREE.OctahedronGeometry(.65),
+ new THREE.MeshStandardMaterial({
+  color:0x6bffe0,emissive:0x087e63,emissiveIntensity:1.6,
+  roughness:.22,metalness:.2
+ }),0,1.2,0);
+shrine.position.set(8,0,-24);
 scene.add(shrine);
 
-// Soft ambient fireflies.
-const fireflies=[];
-const glowMat=new THREE.MeshBasicMaterial({color:0xb5ffd7});
-for(let i=0;i<22;i++){
-const light=new THREE.Mesh(
-new THREE.SphereGeometry(.055,6,6),glowMat
-);
-light.position.set(
-(Math.random()-.5)*32,
-1+Math.random()*5,
--12-Math.random()*35
-);
-scene.add(light);
-fireflies.push(light);
-}
+// Controls and game state.
+let started=false,hp=100,kills=0;
+let jumpV=0,grounded=true,attackCD=0,powerCD=0,invulnerable=0;
+let walkTime=0,elapsed=0;
+const keys={};
+let joyX=0,joyY=0,stickPointer=null;
 
-let hp=100,kills=0,started=false;
-let jumpV=0,grounded=true,attackCD=0,invulnerable=0;
-let heavyCD=0,elapsed=0,walking=0;
-
-const hpEl=document.querySelector('#hp');
-const bar=document.querySelector('#bar');
-const killsEl=document.querySelector('#kills');
-const msg=document.querySelector('#msg');
+const hpText=document.querySelector('#hp');
+const hpBar=document.querySelector('#hpbar');
+const killsText=document.querySelector('#kills');
+const message=document.querySelector('#message');
 
 function updateHUD(){
-hpEl.textContent=Math.ceil(hp);
-bar.style.width=Math.max(0,hp)+'%';
-killsEl.textContent=kills;
-bar.style.background=hp<30?'#ff554b':'#55ed91';
+ hpText.textContent=Math.ceil(hp);
+ hpBar.style.width=hp+'%';
+ hpBar.style.background=hp<30?'#ff5148':'#5bf09a';
+ killsText.textContent=kills;
 }
 
-function hitEnemies(power,range){
-let hit=false;
-for(const e of enemies){
-if(!e.visible)continue;
-const distance=e.position.distanceTo(player.position);
-if(distance<range){
-e.userData.hp-=power;
-hit=true;
-
-// Brief impact flash.
-e.traverse(o=>{
-if(o.isMesh&&o.material&&o.material.emissive){
-o.material.emissive.setHex(0x552211);
-}
-});
-
-if(e.userData.hp<=0){
-e.visible=false;
-kills++;
-msg.textContent='Warrior defeated!';
-}else{
-msg.textContent=power>40?'Power strike!':'Clean hit!';
-}
-}
-}
-if(!hit)msg.textContent='Move closer to an enemy';
-updateHUD();
+function hitEnemies(damage,range){
+ let hit=false;
+ for(const e of enemies){
+  if(!e.visible)continue;
+  if(e.position.distanceTo(player.position)<range){
+   e.userData.hp-=damage;
+   hit=true;
+   if(e.userData.hp<=0){
+    e.visible=false;
+    kills++;
+    message.textContent='Enemy warrior defeated!';
+   }else{
+    message.textContent=damage>35?'Power strike!':'Good hit!';
+   }
+  }
+ }
+ if(!hit)message.textContent='Move closer to the enemy';
+ updateHUD();
 }
 
-function attack(){
-if(!started||hp<=0||attackCD>0)return;
-attackCD=.42;
-player.userData.weapon.rotation.x=-.9;
-hitEnemies(25,3.1);
-}
-
-function heavyAttack(){
-if(!started||hp<=0||heavyCD>0)return;
-heavyCD=1.1;
-player.userData.weapon.rotation.x=-1.6;
-hitEnemies(48,3.7);
+function attack(power=false){
+ if(!started||hp<=0)return;
+ if(power){
+  if(powerCD>0)return;
+  powerCD=.95;
+ }else{
+  if(attackCD>0)return;
+  attackCD=.38;
+ }
+ const j=player.userData.joints;
+ j.weapon.rotation.x=-1.1;
+ j.arms[1].arm.rotation.x=-1.5;
+ j.body.rotation.x=-.20;
+ hitEnemies(power?45:24,power?3.5:3.1);
 }
 
 document.querySelector('#attack').addEventListener('pointerdown',e=>{
-e.preventDefault();attack();
+ e.preventDefault();attack(false);
 });
-document.querySelector('#heavy').addEventListener('pointerdown',e=>{
-e.preventDefault();heavyAttack();
+document.querySelector('#power').addEventListener('pointerdown',e=>{
+ e.preventDefault();attack(true);
 });
 document.querySelector('#jump').addEventListener('pointerdown',e=>{
-e.preventDefault();
-if(grounded&&started&&hp>0){
-jumpV=7;
-grounded=false;
-}
+ e.preventDefault();
+ if(started&&grounded&&hp>0){jumpV=7;grounded=false;}
 });
 
-// Mobile joystick.
 const stick=document.querySelector('#stick');
 const knob=document.querySelector('#knob');
-let joy={x:0,y:0},pointer=null;
-
-function setJoy(e){
-const r=stick.getBoundingClientRect();
-let dx=e.clientX-(r.left+r.width/2);
-let dy=e.clientY-(r.top+r.height/2);
-const len=Math.hypot(dx,dy),max=36;
-if(len>max){dx=dx/len*max;dy=dy/len*max}
-joy={x:dx/max,y:dy/max};
-knob.style.transform=`translate(${dx}px,${dy}px)`;
+function setJoystick(e){
+ const r=stick.getBoundingClientRect();
+ let dx=e.clientX-r.left-r.width/2;
+ let dy=e.clientY-r.top-r.height/2;
+ const length=Math.hypot(dx,dy),max=35;
+ if(length>max){dx=dx/length*max;dy=dy/length*max;}
+ joyX=dx/max;joyY=dy/max;
+ knob.style.transform=`translate(${dx}px,${dy}px)`;
 }
-function resetJoy(){
-joy={x:0,y:0};pointer=null;
-knob.style.transform='translate(0,0)';
+function resetJoystick(){
+ joyX=0;joyY=0;stickPointer=null;
+ knob.style.transform='translate(0,0)';
 }
 stick.addEventListener('pointerdown',e=>{
-e.preventDefault();pointer=e.pointerId;
-stick.setPointerCapture(pointer);setJoy(e);
+ e.preventDefault();
+ stickPointer=e.pointerId;
+ stick.setPointerCapture(e.pointerId);
+ setJoystick(e);
 });
 stick.addEventListener('pointermove',e=>{
-if(e.pointerId===pointer)setJoy(e);
+ if(e.pointerId===stickPointer)setJoystick(e);
 });
-stick.addEventListener('pointerup',resetJoy);
-stick.addEventListener('pointercancel',resetJoy);
+stick.addEventListener('pointerup',resetJoystick);
+stick.addEventListener('pointercancel',resetJoystick);
 
-const keys={};
 addEventListener('keydown',e=>{
-keys[e.key.toLowerCase()]=true;
-if(e.code==='Space'&&grounded&&started){
-jumpV=7;grounded=false;
-}
-if(e.key.toLowerCase()==='f')attack();
-if(e.key.toLowerCase()==='g')heavyAttack();
+ keys[e.key.toLowerCase()]=true;
+ if(e.code==='Space'&&started&&grounded){jumpV=7;grounded=false;}
+ if(e.key.toLowerCase()==='f')attack(false);
+ if(e.key.toLowerCase()==='g')attack(true);
 });
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 
 document.querySelector('#play').addEventListener('click',()=>{
-started=true;
-document.querySelector('#start').style.display='none';
-msg.textContent='Defeat all three warriors!';
+ started=true;
+ document.querySelector('#intro').style.display='none';
+ message.textContent='Defeat all three enemy warriors!';
 });
 
 const clock=new THREE.Clock();
-const target=new THREE.Vector3();
-const cameraPosition=new THREE.Vector3();
+const lookAt=new THREE.Vector3();
+const camTarget=new THREE.Vector3();
 
 function animate(){
-requestAnimationFrame(animate);
-const dt=Math.min(clock.getDelta(),.04);
-elapsed+=dt;
+ requestAnimationFrame(animate);
+ const dt=Math.min(clock.getDelta(),.04);
+ elapsed+=dt;
+ crystal.rotation.y+=dt*.7;
+ crystal.position.y=1.2+Math.sin(elapsed*2)*.12;
 
-crystal.rotation.y+=dt*.65;
-crystal.position.y=1.35+Math.sin(elapsed*2)*.12;
+ attackCD=Math.max(0,attackCD-dt);
+ powerCD=Math.max(0,powerCD-dt);
+ invulnerable=Math.max(0,invulnerable-dt);
 
-fireflies.forEach((f,i)=>{
-f.position.y+=Math.sin(elapsed*1.8+i)*.0015;
-f.position.x+=Math.sin(elapsed+i)*.001;
-});
+ const j=player.userData.joints;
 
-if(started&&hp>0){
-attackCD=Math.max(0,attackCD-dt);
-heavyCD=Math.max(0,heavyCD-dt);
-invulnerable=Math.max(0,invulnerable-dt);
+ if(started&&hp>0){
+  let x=joyX,y=joyY;
+  if(keys.a||keys.arrowleft)x-=1;
+  if(keys.d||keys.arrowright)x+=1;
+  if(keys.w||keys.arrowup)y-=1;
+  if(keys.s||keys.arrowdown)y+=1;
+  const length=Math.hypot(x,y);
+  if(length>1){x/=length;y/=length;}
 
-let x=joy.x,y=joy.y;
-if(keys.a||keys.arrowleft)x-=1;
-if(keys.d||keys.arrowright)x+=1;
-if(keys.w||keys.arrowup)y-=1;
-if(keys.s||keys.arrowdown)y+=1;
+  const moving=length>.08;
+  if(moving){
+   player.position.x+=x*5.2*dt;
+   player.position.z+=y*5.2*dt;
+   player.rotation.y=Math.atan2(-x,-y);
+   walkTime+=dt*10;
+  }else{
+   walkTime+=dt*2;
+  }
 
-const len=Math.hypot(x,y);
-if(len>1){x/=len;y/=len}
+  player.position.x=THREE.MathUtils.clamp(player.position.x,-42,42);
+  player.position.z=THREE.MathUtils.clamp(player.position.z,-45,32);
 
-if(len>.08){
-player.position.x+=x*5.3*dt;
-player.position.z+=y*5.3*dt;
-player.rotation.y=Math.atan2(-x,-y);
-walking+=dt*10;
-}else{
-walking+=dt*2;
-}
+  // Jump arc and landing.
+  jumpV-=17*dt;
+  player.position.y+=jumpV*dt;
+  if(player.position.y<=0){
+   player.position.y=0;jumpV=0;grounded=true;
+  }
 
-player.position.x=THREE.MathUtils.clamp(player.position.x,-42,42);
-player.position.z=THREE.MathUtils.clamp(player.position.z,-48,35);
+  // Procedural walk cycle: arms, legs, head and torso.
+  const speed=moving?1:0;
+  const swing=Math.sin(walkTime)*.62*speed;
+  j.legs[0].rotation.x=swing;
+  j.legs[1].rotation.x=-swing;
+  j.arms[0].arm.rotation.x=-swing*.7;
+  j.arms[1].arm.rotation.x=swing*.7;
+  j.body.position.y=1.28+Math.abs(Math.sin(walkTime*2))*.035*speed;
+  j.head.rotation.z=Math.sin(elapsed*1.5)*.025;
+  j.body.rotation.x=THREE.MathUtils.lerp(j.body.rotation.x,0,dt*5);
 
-jumpV-=17*dt;
-player.position.y+=jumpV*dt;
-if(player.position.y<=0){
-player.position.y=0;jumpV=0;grounded=true;
-}
+  // Return weapon to neutral position after the strike.
+  if(attackCD===0&&powerCD===0){
+   j.weapon.rotation.x=THREE.MathUtils.lerp(j.weapon.rotation.x,0,dt*8);
+   j.arms[1].arm.rotation.x=THREE.MathUtils.lerp(j.arms[1].arm.rotation.x,0,dt*8);
+  }
 
-const moveAmount=len>.08?1:0;
-player.userData.legs[0].rotation.x=Math.sin(walking)*.65*moveAmount;
-player.userData.legs[1].rotation.x=-Math.sin(walking)*.65*moveAmount;
-player.userData.arms[0].rotation.x=-Math.sin(walking)*.4*moveAmount;
-player.userData.arms[1].rotation.x=Math.sin(walking)*.4*moveAmount;
-player.userData.torso.position.y=1.18+Math.sin(walking*2)*.035*moveAmount;
+  // Enemy pursuit and attack animations.
+  for(const e of enemies){
+   if(!e.visible)continue;
+   const d=new THREE.Vector3().subVectors(player.position,e.position);
+   d.y=0;
+   const distance=d.length();
+   const ej=e.userData.joints;
+   e.userData.phase+=dt*5;
 
-for(const e of enemies){
-if(!e.visible)continue;
-e.userData.phase+=dt*4;
+   if(distance>1.65&&distance<40){
+    d.normalize();
+    e.position.addScaledVector(d,1.25*dt);
+    e.rotation.y=Math.atan2(-d.x,-d.z);
+    ej.legs[0].rotation.x=Math.sin(e.userData.phase)*.45;
+    ej.legs[1].rotation.x=-Math.sin(e.userData.phase)*.45;
+    ej.arms[0].arm.rotation.x=-Math.sin(e.userData.phase)*.25;
+    ej.arms[1].arm.rotation.x=Math.sin(e.userData.phase)*.25;
+   }else if(distance<=1.8){
+    e.userData.attackTimer-=dt;
+    if(e.userData.attackTimer<=0&&invulnerable<=0){
+     hp=Math.max(0,hp-7);
+     invulnerable=.55;
+     e.userData.attackTimer=1.1;
+     ej.arms[1].arm.rotation.x=-1.3;
+     message.textContent=hp>0?'Enemy strike!':'You are defeated — refresh to restart';
+     updateHUD();
+    }
+   }
+  }
+ }
 
-const direction=new THREE.Vector3().subVectors(player.position,e.position);
-direction.y=0;
-const distance=direction.length();
-
-if(distance>1.65&&distance<38){
-direction.normalize();
-e.position.addScaledVector(direction,1.15*dt);
-e.rotation.y=Math.atan2(-direction.x,-direction.z);
-e.userData.legs[0].rotation.x=Math.sin(e.userData.phase)*.45;
-e.userData.legs[1].rotation.x=-Math.sin(e.userData.phase)*.45;
-}else if(distance<=1.8){
-e.userData.cool-=dt;
-if(e.userData.cool<=0&&invulnerable<=0){
-hp=Math.max(0,hp-8);
-invulnerable=.65;
-e.userData.cool=1.15;
-updateHUD();
-msg.textContent=hp>0?'You were hit!':'Defeated — refresh to restart';
-}
-}
-}
-}
-
-// Smooth third-person follow camera.
-target.set(player.position.x,player.position.y+1.45,player.position.z);
-cameraPosition.set(player.position.x,player.position.y+4.3,player.position.z+8.4);
-camera.position.lerp(cameraPosition,1-Math.exp(-4.5*dt));
-camera.lookAt(target);
-
-renderer.render(scene,camera);
+ // Smooth third-person camera.
+ lookAt.set(player.position.x,player.position.y+1.25,player.position.z);
+ camTarget.set(player.position.x,player.position.y+4.0,player.position.z+7.8);
+ camera.position.lerp(camTarget,1-Math.exp(-4.5*dt));
+ camera.lookAt(lookAt);
+ renderer.render(scene,camera);
 }
 
 addEventListener('resize',()=>{
-camera.aspect=innerWidth/innerHeight;
-camera.updateProjectionMatrix();
-renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
+ renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 });
 
 updateHUD();
