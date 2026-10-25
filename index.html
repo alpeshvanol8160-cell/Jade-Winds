@@ -1,258 +1,267 @@
- 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Jade Winds - Warrior Edition</title>
+<title>Jade Winds - Warrior Upgrade</title>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.module.js"}}
 </script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:#9bbfc9;color:white;font-family:Arial;touch-action:none}
+body{margin:0;overflow:hidden;background:#8fb8c9;color:white;font-family:Arial;touch-action:none}
 canvas{display:block}
-#hud{position:fixed;top:12px;left:10px;z-index:2;background:#101a25df;padding:12px;border:1px solid #9de7cf70;border-radius:12px;font-size:13px}
-#bar{width:150px;height:8px;background:#552525;border-radius:8px;overflow:hidden;margin:5px 0}
-#hpbar{width:100%;height:100%;background:#5bf09a}
-#stick{position:fixed;z-index:3;bottom:22px;left:20px;width:112px;height:112px;border:2px solid #ffffff90;border-radius:50%;background:#ffffff25;touch-action:none}
-#knob{position:absolute;width:44px;height:44px;left:32px;top:32px;border-radius:50%;background:#ffffffd9}
-.btn{position:fixed;z-index:3;border:2px solid #ffffffaa;border-radius:50%;color:white;font-size:11px;font-weight:bold;touch-action:none}
-#attack{right:20px;bottom:25px;width:76px;height:76px;background:#a82e38}
-#power{right:20px;bottom:112px;width:58px;height:58px;background:#976322}
-#jump{right:88px;bottom:112px;width:58px;height:58px;background:#247da8}
-#message{position:fixed;bottom:155px;left:50%;transform:translateX(-50%);background:#101820cc;padding:8px 12px;border-radius:12px;font-size:12px;white-space:nowrap;z-index:2}
-#intro{position:fixed;inset:0;z-index:5;display:grid;place-items:center;text-align:center;background:linear-gradient(#0c2638bb,#08131df2);padding:20px}
-#panel{max-width:340px;background:#152b39f5;border:1px solid #9de7cf80;border-radius:20px;padding:25px}
-h1{letter-spacing:3px;color:#a9f1d1}
-button{cursor:pointer}
-#play{background:#5ce3a0;border:0;padding:13px 26px;border-radius:9px;font-weight:bold}
+#hud{position:fixed;top:9px;left:9px;z-index:2;background:#101a25e8;border:1px solid #9de7cf66;padding:10px;border-radius:11px;font-size:12px}
+#hpbar{height:8px;width:150px;background:#55ed91;border-radius:8px;margin-top:5px}
+#hpbg{height:8px;width:150px;background:#552525;border-radius:8px;overflow:hidden}
+#stick{position:fixed;z-index:3;bottom:20px;left:20px;width:110px;height:110px;border:2px solid #ffffff99;background:#ffffff20;border-radius:50%;touch-action:none}
+#knob{position:absolute;left:32px;top:32px;width:42px;height:42px;background:#ffffffdf;border-radius:50%}
+.btn{position:fixed;z-index:3;border:2px solid #ffffff9c;border-radius:50%;font-size:10px;font-weight:bold;color:white;touch-action:none}
+#attack{right:17px;bottom:23px;width:75px;height:75px;background:#ad3038}
+#power{right:18px;bottom:106px;width:58px;height:58px;background:#a26b24}
+#jump{right:85px;bottom:106px;width:58px;height:58px;background:#217ca8}
+#msg{position:fixed;bottom:153px;left:50%;transform:translateX(-50%);z-index:2;background:#101820ce;padding:8px 11px;border-radius:12px;font-size:11px;white-space:nowrap}
+#intro{position:fixed;inset:0;z-index:5;background:linear-gradient(#0d293bd9,#08121df5);display:grid;place-items:center;text-align:center;padding:20px}
+#card{max-width:340px;padding:25px;background:#162b3a;border:1px solid #a5ebd488;border-radius:20px}
+h1{color:#a5f2d0;letter-spacing:3px}
+#play{background:#63e5a2;padding:13px 25px;border:0;border-radius:9px;font-weight:bold}
 </style>
 </head>
 <body>
 <div id="hud">
-<b style="color:#a9f1d1;letter-spacing:2px">JADE WINDS</b><br>
-Warrior HP: <span id="hp">100</span>/100
-<div id="bar"><div id="hpbar"></div></div>
+<b style="color:#a5f2d0;letter-spacing:2px">JADE WINDS</b><br>
+HP: <span id="hp">100</span>/100
+<div id="hpbg"><div id="hpbar"></div></div>
 Defeated: <span id="kills">0</span>/3
 </div>
-
 <div id="stick"><div id="knob"></div></div>
-<button class="btn" id="attack">ATTACK</button>
-<button class="btn" id="power">POWER</button>
-<button class="btn" id="jump">JUMP</button>
-<div id="message">Defeat the enemy warriors!</div>
-
-<div id="intro">
-<div id="panel">
+<button id="attack" class="btn">ATTACK</button>
+<button id="power" class="btn">POWER</button>
+<button id="jump" class="btn">JUMP</button>
+<div id="msg">Enter the forest and defeat the warriors</div>
+<div id="intro"><div id="card">
 <h1>JADE WINDS</h1>
-<p>WARRIOR EDITION</p>
-<p>Explore the ancient forest, jump, move and fight enemy warriors.</p>
-<p>Mobile: joystick + action buttons<br>PC: WASD / arrows, Space, F, G</p>
+<p>WARRIOR COMBAT</p>
+<p>Explore the ancient forest, master your staff and defeat three enemy warriors.</p>
+<p>Move with the joystick. Use ATTACK, POWER and JUMP.</p>
 <button id="play">ENTER THE FOREST</button>
-</div>
-</div>
+</div></div>
 
 <script type="module">
 import * as THREE from 'three';
 
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x9fc8dc);
-scene.fog=new THREE.Fog(0xa6c9c8,45,135);
+scene.background=new THREE.Color(0x9fc9dc);
+scene.fog=new THREE.Fog(0x9fc9dc,48,145);
 
-const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,200);
+const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,220);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.1;
+renderer.toneMappingExposure=1.12;
 document.body.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xe0f5ff,0x3e4a2a,2));
-const sun=new THREE.DirectionalLight(0xffe1ac,3);
-sun.position.set(-25,40,25);
+scene.add(new THREE.HemisphereLight(0xe4f5ff,0x3e4931,2.2));
+const sun=new THREE.DirectionalLight(0xffdfad,3);
+sun.position.set(-25,38,24);
 scene.add(sun);
-const rim=new THREE.DirectionalLight(0x80caff,1.2);
-rim.position.set(20,12,-20);
+const rim=new THREE.DirectionalLight(0x75c9ff,1.15);
+rim.position.set(20,14,-24);
 scene.add(rim);
 
-const material=(c,r=.75,m=0)=>new THREE.MeshStandardMaterial({
+const mat=(c,r=.75,m=0)=>new THREE.MeshStandardMaterial({
  color:c,roughness:r,metalness:m
 });
-const skin=material(0xb97850);
-const dark=material(0x20232d);
-const gold=material(0xd9b45e,.35,.65);
-const jade=material(0x207a66,.55,.15);
-const leather=material(0x64402b);
-const groundMat=material(0x597d42);
-const stone=material(0x7c817c);
+const groundMat=mat(0x62864b);
+const barkMat=mat(0x573925);
+const stoneMat=mat(0x777e7c);
+const goldMat=mat(0xe0ba66,.32,.65);
+const jadeMat=mat(0x16a987,.28,.25);
 
-function mesh(parent,geo,mat,x=0,y=0,z=0){
- const o=new THREE.Mesh(geo,mat);
+function addMesh(parent,geometry,material,x=0,y=0,z=0){
+ const o=new THREE.Mesh(geometry,material);
  o.position.set(x,y,z);
  parent.add(o);
  return o;
 }
 
-// Ground and forest.
-const floor=mesh(scene,new THREE.PlaneGeometry(180,180),groundMat,0,-.13,0);
-floor.rotation.x=-Math.PI/2;
+// Environment
+const ground=addMesh(scene,new THREE.PlaneGeometry(190,190),groundMat,0,-.12,0);
+ground.rotation.x=-Math.PI/2;
 
-for(let i=0;i<95;i++){
- const x=(Math.random()-.5)*90;
- const z=(Math.random()-.5)*105;
- if(Math.abs(x)<5&&z<14&&z>-30)continue;
+for(let i=0;i<125;i++){
+ const x=(Math.random()-.5)*100;
+ const z=(Math.random()-.5)*115;
+ if(Math.abs(x)<5&&z<15&&z>-38)continue;
  const tree=new THREE.Group();
- const h=2.5+Math.random()*2;
- mesh(tree,new THREE.CylinderGeometry(.15,.32,h,7),leather,0,h/2,0);
- for(let j=0;j<3;j++)
-  mesh(tree,new THREE.ConeGeometry(1.3-j*.18,1.8,7),
-   material([0x245539,0x347348,0x477f49][j]),0,h*.55+j*.72,0);
+ const h=2.7+Math.random()*2.3;
+ addMesh(tree,new THREE.CylinderGeometry(.15,.31,h,8),barkMat,0,h/2,0);
+ for(let j=0;j<3;j++){
+  addMesh(tree,new THREE.ConeGeometry(1.3-j*.18,1.8,8),
+   mat([0x235439,0x327247,0x46824b][j]),0,h*.55+j*.72,0);
+ }
  tree.position.set(x,0,z);
+ tree.rotation.y=Math.random()*6;
  scene.add(tree);
 }
 
-for(let i=0;i<24;i++){
- const h=9+Math.random()*13;
- const mountain=mesh(scene,new THREE.ConeGeometry(h*.8,h,7),
-  material(i%2?0x607e79:0x718e87), (Math.random()-.5)*120,h*.38,-45-Math.random()*55);
- mountain.scale.z=1.4;
-}
-for(let i=0;i<35;i++){
- const rock=mesh(scene,new THREE.DodecahedronGeometry(.4+Math.random()*.7),
-  stone,(Math.random()-.5)*70,.1,(Math.random()-.5)*75);
- rock.scale.y=.65;
+for(let i=0;i<28;i++){
+ const h=10+Math.random()*13;
+ const m=addMesh(scene,new THREE.ConeGeometry(h*.8,h,7),
+  mat(i%2?0x6e918a:0x5b7d7d),
+  (Math.random()-.5)*125,h*.4,-48-Math.random()*60);
+ m.scale.z=1.35;
 }
 
-// Detailed stylized humanoid warrior with articulated joints.
-function makeWarrior(isEnemy=false,color=0x176f65){
+for(let i=0;i<45;i++){
+ const rock=addMesh(scene,new THREE.DodecahedronGeometry(.4+Math.random()*.8),
+  stoneMat,(Math.random()-.5)*90,.1,(Math.random()-.5)*95);
+ rock.scale.y=.55+Math.random()*.5;
+ rock.rotation.set(Math.random(),Math.random(),Math.random());
+}
+
+// Procedurally built character. No external model files.
+function makeWarrior(enemy=false,color=0x167765){
  const root=new THREE.Group();
- const outfit=material(color,.65);
- const armor=material(isEnemy?0x633b35:0x25495c,.4,.25);
- const cloth=material(isEnemy?0x522c2a:0x173b36);
- const hair=material(isEnemy?0x241c1b:0x171c25);
- const bright=material(isEnemy?0xb84636:0x38c5a0,.35,.25);
- const joints={};
+ const clothes=mat(color,.64);
+ const armor=mat(enemy?0x553d38:0x244653,.4,.28);
+ const darkCloth=mat(enemy?0x422927:0x143b34);
+ const hair=mat(0x171a20,.8);
+ const skin=mat(enemy?0xa96848:0xc88962);
+ const metal=mat(enemy?0x9a5a38:0x31bfa0,.3,.35);
+ const joints={legs:[],arms:[]};
 
- // Boots and articulated legs.
- joints.legs=[];
+ // Lower body: upper legs, knees, boots.
  for(const side of [-1,1]){
   const leg=new THREE.Group();
-  leg.position.set(side*.19,.76,0);
+  leg.position.set(side*.19,.79,0);
   root.add(leg);
-  mesh(leg,new THREE.CapsuleGeometry(.14,.38,4,8),outfit,0,-.19,0);
-  mesh(leg,new THREE.SphereGeometry(.145,10,8),armor,0,-.39,0);
-  mesh(leg,new THREE.BoxGeometry(.29,.15,.39),dark,0,-.48,-.07);
-  mesh(leg,new THREE.BoxGeometry(.30,.08,.12),gold,0,-.35,.08);
   joints.legs.push(leg);
+  addMesh(leg,new THREE.CapsuleGeometry(.14,.35,4,9),clothes,0,-.18,0);
+  addMesh(leg,new THREE.SphereGeometry(.145,12,10),armor,0,-.37,0);
+  addMesh(leg,new THREE.BoxGeometry(.30,.16,.40),darkCloth,0,-.48,-.06);
+  addMesh(leg,new THREE.BoxGeometry(.30,.055,.13),goldMat,0,-.37,.10);
  }
 
- // Torso pivot makes the body lean during movement.
+ // Torso pivot.
  const body=new THREE.Group();
- body.position.y=1.28;
+ body.position.y=1.30;
  root.add(body);
  joints.body=body;
 
- mesh(body,new THREE.CapsuleGeometry(.32,.48,5,10),outfit);
- mesh(body,new THREE.BoxGeometry(.66,.22,.43),armor,0,-.20,0);
- mesh(body,new THREE.BoxGeometry(.70,.10,.46),gold,0,-.34,0);
- mesh(body,new THREE.BoxGeometry(.72,.09,.47),leather,0,-.43,0);
+ addMesh(body,new THREE.CapsuleGeometry(.32,.48,5,12),clothes);
+ addMesh(body,new THREE.BoxGeometry(.66,.20,.43),armor,0,-.20,0);
+ addMesh(body,new THREE.BoxGeometry(.72,.10,.46),darkCloth,0,-.34,0);
+ addMesh(body,new THREE.BoxGeometry(.70,.07,.47),goldMat,0,-.39,0);
 
- // Layered chest plates.
+ // Chest armor: layered plates.
  for(let i=0;i<3;i++){
-  const plate=mesh(body,new THREE.BoxGeometry(.49,.13,.09),armor,0,.13-i*.16,.25);
-  plate.rotation.x=-.12;
+  const plate=addMesh(body,new THREE.BoxGeometry(.48,.13,.09),armor,0,.14-i*.16,.25);
+  plate.rotation.x=-.10;
+  addMesh(body,new THREE.BoxGeometry(.50,.025,.025),goldMat,0,.19-i*.16,.305);
  }
- mesh(body,new THREE.SphereGeometry(.105,12,10),bright,0,.10,.32);
-
- // Shoulder guards.
- for(const side of [-1,1]){
-  const shoulder=mesh(body,new THREE.SphereGeometry(.21,12,10),armor,side*.42,.24,0);
-  shoulder.scale.set(1,.72,1);
-  mesh(body,new THREE.BoxGeometry(.17,.09,.35),gold,side*.43,.14,0);
- }
+ addMesh(body,new THREE.SphereGeometry(.10,14,12),metal,0,.10,.33);
 
  // Neck.
- mesh(body,new THREE.CylinderGeometry(.10,.12,.18,10),skin,0,.48,0);
+ addMesh(body,new THREE.CylinderGeometry(.10,.12,.18,12),skin,0,.47,0);
 
- // Head with face, ears, brows, eyes, nose and beard.
+ // Head with face, brows, eyes, nose, beard and tied hair.
  const head=new THREE.Group();
- head.position.set(0,.69,0);
+ head.position.set(0,.68,0);
  body.add(head);
  joints.head=head;
 
- mesh(head,new THREE.SphereGeometry(.245,16,14),skin,0,0,0);
+ addMesh(head,new THREE.SphereGeometry(.245,20,16),skin);
  for(const side of [-1,1]){
-  mesh(head,new THREE.SphereGeometry(.06,8,8),skin,side*.24,0,0);
-  mesh(head,new THREE.SphereGeometry(.035,8,8),dark,side*.085,.045,.215);
-  mesh(head,new THREE.BoxGeometry(.085,.025,.025),hair,side*.085,.105,.22);
+  addMesh(head,new THREE.SphereGeometry(.055,10,8),skin,side*.235,0,0);
+  addMesh(head,new THREE.SphereGeometry(.030,10,8),mat(0x111318),side*.083,.035,.218);
+  addMesh(head,new THREE.BoxGeometry(.085,.025,.025),hair,side*.083,.087,.22);
  }
- mesh(head,new THREE.ConeGeometry(.055,.14,7),skin,0,-.045,.235);
- mesh(head,new THREE.SphereGeometry(.14,10,8),hair,0,-.16,.09);
+ addMesh(head,new THREE.ConeGeometry(.045,.13,8),skin,0,-.035,.24);
 
- // Hair cap and long tied hair.
- const cap=mesh(head,new THREE.SphereGeometry(.26,12,8),hair,0,.13,-.025);
- cap.scale.set(1,.55,1);
- mesh(head,new THREE.ConeGeometry(.09,.36,8),hair,0,.37,-.05);
- const pony=mesh(head,new THREE.CapsuleGeometry(.075,.44,4,7),hair,0,.10,-.28);
+ const beard=addMesh(head,new THREE.ConeGeometry(.13,.20,8),hair,0,-.19,.10);
+ beard.rotation.x=-.12;
+
+ const cap=addMesh(head,new THREE.SphereGeometry(.26,16,12),hair,0,.13,-.025);
+ cap.scale.set(1,.54,1);
+ addMesh(head,new THREE.ConeGeometry(.085,.32,9),hair,0,.34,-.04);
+ const pony=addMesh(head,new THREE.CapsuleGeometry(.065,.38,4,8),hair,0,.06,-.29);
  pony.rotation.x=-.65;
 
- // Headband.
- mesh(head,new THREE.TorusGeometry(.232,.035,7,18),gold,0,.10,0);
+ const band=addMesh(head,new THREE.TorusGeometry(.233,.032,8,24),goldMat,0,.095,0);
+ band.rotation.x=.05;
 
- // Arms with elbow joints and forearm guards.
- joints.arms=[];
+ // Shoulder pads and articulated arms.
+ for(const side of [-1,1]){
+  const shoulder=addMesh(body,new THREE.SphereGeometry(.205,14,10),armor,side*.43,.23,0);
+  shoulder.scale.set(1,.72,1);
+  addMesh(body,new THREE.BoxGeometry(.16,.07,.30),goldMat,side*.44,.15,0);
+ }
+
  for(const side of [-1,1]){
   const arm=new THREE.Group();
-  arm.position.set(side*.43,.27,0);
+  arm.position.set(side*.43,.25,0);
   body.add(arm);
-  mesh(arm,new THREE.CapsuleGeometry(.115,.29,4,8),outfit,0,-.18,0);
-  mesh(arm,new THREE.SphereGeometry(.125,10,8),armor,0,-.38,0);
+
+  addMesh(arm,new THREE.CapsuleGeometry(.12,.27,4,9),clothes,0,-.17,0);
+  addMesh(arm,new THREE.SphereGeometry(.125,12,10),armor,0,-.36,0);
 
   const forearm=new THREE.Group();
-  forearm.position.y=-.39;
+  forearm.position.y=-.37;
   arm.add(forearm);
-  mesh(forearm,new THREE.CapsuleGeometry(.095,.25,4,8),skin,0,-.13,0);
-  const guard=mesh(forearm,new THREE.BoxGeometry(.22,.20,.18),armor,0,-.16,.06);
-  guard.rotation.z=side*.1;
-  mesh(forearm,new THREE.TorusGeometry(.11,.025,6,12),gold,0,-.27,0);
-  mesh(forearm,new THREE.SphereGeometry(.105,10,8),skin,0,-.31,0);
+  addMesh(forearm,new THREE.CapsuleGeometry(.095,.22,4,9),skin,0,-.12,0);
+  addMesh(forearm,new THREE.BoxGeometry(.21,.19,.17),armor,0,-.14,.055);
+  addMesh(forearm,new THREE.TorusGeometry(.105,.023,7,16),goldMat,0,-.25,0);
+  addMesh(forearm,new THREE.SphereGeometry(.10,12,10),skin,0,-.29,0);
+
   joints.arms.push({arm,forearm});
  }
 
- // Cloth panels hanging from the belt.
+ // Belt and hanging cloth panels.
+ addMesh(body,new THREE.TorusGeometry(.31,.045,8,24),goldMat,0,-.44,0);
  for(const side of [-1,1]){
-  const panel=mesh(body,new THREE.BoxGeometry(.21,.45,.07),cloth,side*.21,-.62,.04);
-  panel.rotation.z=side*.12;
-  mesh(body,new THREE.BoxGeometry(.20,.07,.09),gold,side*.21,-.40,.07);
+  const panel=addMesh(body,new THREE.BoxGeometry(.21,.42,.075),darkCloth,side*.21,-.64,.07);
+  panel.rotation.z=side*.13;
+  addMesh(body,new THREE.BoxGeometry(.21,.045,.085),goldMat,side*.21,-.43,.09);
  }
 
- // Staff in the right hand, with metallic fittings.
+ // Staff with metal caps.
  const weapon=new THREE.Group();
- weapon.position.set(.53,-.61,.03);
+ weapon.position.set(.54,-.59,.03);
  weapon.rotation.z=-.18;
  body.add(weapon);
- mesh(weapon,new THREE.CylinderGeometry(.035,.05,1.35,9),
-  material(0x80542e,.4),0,-.13,0);
- for(const y of [-.72,.46]){
-  mesh(weapon,new THREE.CylinderGeometry(.065,.065,.09,10),gold,0,y,0);
- }
- mesh(weapon,new THREE.ConeGeometry(.065,.18,8),gold,0,.60,0);
  joints.weapon=weapon;
+ addMesh(weapon,new THREE.CylinderGeometry(.035,.05,1.38,10),
+  mat(0x80532e,.42),0,-.13,0);
+ for(const y of [-.72,.46]){
+  addMesh(weapon,new THREE.CylinderGeometry(.065,.065,.09,10),goldMat,0,y,0);
+ }
+ addMesh(weapon,new THREE.ConeGeometry(.065,.17,9),goldMat,0,.60,0);
+
+ // Scabbard on the back.
+ const sheath=addMesh(body,new THREE.CylinderGeometry(.045,.06,.85,8),
+  darkCloth,-.23,-.12,-.22);
+ sheath.rotation.x=.25;
+ sheath.rotation.z=-.20;
 
  root.userData={
-  joints,hp:100,enemy:isEnemy,attackTimer:0,phase:Math.random()*6
+  joints,hp:100,enemy,
+  phase:Math.random()*6,
+  attackTimer:Math.random()*.5,
+  action:'idle',actionTime:0,hitFlash:0
  };
  return root;
 }
 
-const player=makeWarrior(false,0x187a65);
+const player=makeWarrior(false,0x137b67);
 player.position.set(0,0,5);
 scene.add(player);
 
 const enemies=[];
-const enemyColors=[0x80372e,0x55417e,0x92702e];
+const enemyColors=[0x87352d,0x584181,0x94702c];
 for(let i=0;i<3;i++){
  const e=makeWarrior(true,enemyColors[i]);
  e.position.set((i-1)*4,0,-5-i*6);
@@ -260,35 +269,42 @@ for(let i=0;i<3;i++){
  enemies.push(e);
 }
 
-// Ancient jade crystal shrine.
+// Floating jade shrine.
 const shrine=new THREE.Group();
-mesh(shrine,new THREE.CylinderGeometry(1.2,1.5,.45,8),
- material(0x787f79),0,.2,0);
-const crystal=mesh(shrine,new THREE.OctahedronGeometry(.65),
+addMesh(shrine,new THREE.CylinderGeometry(1.15,1.45,.4,8),
+ mat(0x737c79),0,.2,0);
+const crystal=addMesh(shrine,new THREE.OctahedronGeometry(.62),
  new THREE.MeshStandardMaterial({
-  color:0x6bffe0,emissive:0x087e63,emissiveIntensity:1.6,
-  roughness:.22,metalness:.2
- }),0,1.2,0);
-shrine.position.set(8,0,-24);
+  color:0x7effdc,emissive:0x087a5a,emissiveIntensity:1.5,
+  metalness:.25,roughness:.2
+ }),0,1.15,0);
+shrine.position.set(8,0,-25);
 scene.add(shrine);
 
-// Controls and game state.
+// Game state.
 let started=false,hp=100,kills=0;
-let jumpV=0,grounded=true,attackCD=0,powerCD=0,invulnerable=0;
-let walkTime=0,elapsed=0;
-const keys={};
+let jumpV=0,grounded=true;
+let attackCD=0,powerCD=0,invulnerable=0;
+let elapsed=0,walkTime=0;
 let joyX=0,joyY=0,stickPointer=null;
+const keys={};
 
 const hpText=document.querySelector('#hp');
 const hpBar=document.querySelector('#hpbar');
 const killsText=document.querySelector('#kills');
-const message=document.querySelector('#message');
+const msg=document.querySelector('#msg');
 
 function updateHUD(){
  hpText.textContent=Math.ceil(hp);
  hpBar.style.width=hp+'%';
- hpBar.style.background=hp<30?'#ff5148':'#5bf09a';
+ hpBar.style.background=hp<30?'#ff5148':'#55ed91';
  killsText.textContent=kills;
+}
+
+function setAction(character,name,duration){
+ const u=character.userData;
+ u.action=name;
+ u.actionTime=duration;
 }
 
 function hitEnemies(damage,range){
@@ -297,17 +313,19 @@ function hitEnemies(damage,range){
   if(!e.visible)continue;
   if(e.position.distanceTo(player.position)<range){
    e.userData.hp-=damage;
+   setAction(e,'hit',.22);
+   e.userData.hitFlash=.2;
    hit=true;
    if(e.userData.hp<=0){
     e.visible=false;
     kills++;
-    message.textContent='Enemy warrior defeated!';
+    msg.textContent='Warrior defeated!';
    }else{
-    message.textContent=damage>35?'Power strike!':'Good hit!';
+    msg.textContent=damage>35?'POWER STRIKE!':'Clean hit!';
    }
   }
  }
- if(!hit)message.textContent='Move closer to the enemy';
+ if(!hit)msg.textContent='Move closer to the enemy';
  updateHUD();
 }
 
@@ -315,16 +333,15 @@ function attack(power=false){
  if(!started||hp<=0)return;
  if(power){
   if(powerCD>0)return;
-  powerCD=.95;
+  powerCD=1.05;
+  setAction(player,'power',.45);
+  hitEnemies(45,3.6);
  }else{
   if(attackCD>0)return;
-  attackCD=.38;
+  attackCD=.42;
+  setAction(player,'attack',.32);
+  hitEnemies(24,3.2);
  }
- const j=player.userData.joints;
- j.weapon.rotation.x=-1.1;
- j.arms[1].arm.rotation.x=-1.5;
- j.body.rotation.x=-.20;
- hitEnemies(power?45:24,power?3.5:3.1);
 }
 
 document.querySelector('#attack').addEventListener('pointerdown',e=>{
@@ -335,11 +352,15 @@ document.querySelector('#power').addEventListener('pointerdown',e=>{
 });
 document.querySelector('#jump').addEventListener('pointerdown',e=>{
  e.preventDefault();
- if(started&&grounded&&hp>0){jumpV=7;grounded=false;}
+ if(started&&grounded&&hp>0){
+  jumpV=7;grounded=false;
+  setAction(player,'jump',.25);
+ }
 });
 
 const stick=document.querySelector('#stick');
 const knob=document.querySelector('#knob');
+
 function setJoystick(e){
  const r=stick.getBoundingClientRect();
  let dx=e.clientX-r.left-r.width/2;
@@ -354,10 +375,8 @@ function resetJoystick(){
  knob.style.transform='translate(0,0)';
 }
 stick.addEventListener('pointerdown',e=>{
- e.preventDefault();
- stickPointer=e.pointerId;
- stick.setPointerCapture(e.pointerId);
- setJoystick(e);
+ e.preventDefault();stickPointer=e.pointerId;
+ stick.setPointerCapture(e.pointerId);setJoystick(e);
 });
 stick.addEventListener('pointermove',e=>{
  if(e.pointerId===stickPointer)setJoystick(e);
@@ -367,7 +386,7 @@ stick.addEventListener('pointercancel',resetJoystick);
 
 addEventListener('keydown',e=>{
  keys[e.key.toLowerCase()]=true;
- if(e.code==='Space'&&started&&grounded){jumpV=7;grounded=false;}
+ if(e.code==='Space'&&started&&grounded){jumpV=7;grounded=false;setAction(player,'jump',.25);}
  if(e.key.toLowerCase()==='f')attack(false);
  if(e.key.toLowerCase()==='g')attack(true);
 });
@@ -376,25 +395,81 @@ addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 document.querySelector('#play').addEventListener('click',()=>{
  started=true;
  document.querySelector('#intro').style.display='none';
- message.textContent='Defeat all three enemy warriors!';
+ msg.textContent='Defeat all three warriors!';
 });
 
 const clock=new THREE.Clock();
 const lookAt=new THREE.Vector3();
 const camTarget=new THREE.Vector3();
 
+function animateCharacter(c,dt,moving,phase){
+ const u=c.userData,j=u.joints;
+ u.phase+=dt*(moving?9:2.2);
+ u.actionTime=Math.max(0,u.actionTime-dt);
+ u.hitFlash=Math.max(0,u.hitFlash-dt);
+ const swing=Math.sin(u.phase)*.64*(moving?1:0);
+ const idle=Math.sin(elapsed*1.5)*.025;
+
+ // Base locomotion.
+ j.legs[0].rotation.x=swing;
+ j.legs[1].rotation.x=-swing;
+ j.arms[0].arm.rotation.x=-swing*.65;
+ j.arms[1].arm.rotation.x=swing*.65;
+ j.body.position.y=1.30+(moving?Math.abs(Math.sin(u.phase*2))*.035:idle);
+ j.head.rotation.z=Math.sin(elapsed*1.3+phase)*.025;
+
+ // Return to default pose before applying an action.
+ j.body.rotation.x=THREE.MathUtils.lerp(j.body.rotation.x,0,dt*7);
+ j.body.rotation.z=THREE.MathUtils.lerp(j.body.rotation.z,0,dt*7);
+ j.weapon.rotation.x=THREE.MathUtils.lerp(j.weapon.rotation.x,0,dt*6);
+ j.weapon.rotation.z=THREE.MathUtils.lerp(j.weapon.rotation.z,-.18,dt*6);
+ for(const a of j.arms){
+  a.arm.rotation.z=THREE.MathUtils.lerp(a.arm.rotation.z,0,dt*7);
+  a.forearm.rotation.x=THREE.MathUtils.lerp(a.forearm.rotation.x,0,dt*7);
+ }
+
+ // Staff swings with torso and arm follow-through.
+ if(u.action==='attack'&&u.actionTime>0){
+  const t=u.actionTime/.32;
+  const swingAngle=Math.sin((1-t)*Math.PI);
+  j.body.rotation.y=.65*swingAngle;
+  j.body.rotation.x=-.18*swingAngle;
+  j.arms[1].arm.rotation.x=-1.25*swingAngle;
+  j.arms[1].arm.rotation.z=-.6*swingAngle;
+  j.weapon.rotation.x=-1.8*swingAngle;
+  j.weapon.rotation.z=-.18-1.1*swingAngle;
+ }else if(u.action==='power'&&u.actionTime>0){
+  const t=u.actionTime/.45;
+  const a=Math.sin((1-t)*Math.PI);
+  j.body.rotation.y=.95*a;
+  j.body.rotation.x=-.3*a;
+  j.arms[1].arm.rotation.x=-1.65*a;
+  j.arms[0].arm.rotation.x=-.8*a;
+  j.weapon.rotation.x=-2.2*a;
+  j.weapon.rotation.z=-.18-1.35*a;
+ }else if(u.action==='hit'&&u.actionTime>0){
+  j.body.rotation.x=.25;
+  j.body.rotation.z=.2*Math.sin(u.actionTime*18);
+ }else if(u.action==='jump'&&u.actionTime>0){
+  j.arms[0].arm.rotation.x=-.8;
+  j.arms[1].arm.rotation.x=-.8;
+  j.legs[0].rotation.x=-.4;
+  j.legs[1].rotation.x=.4;
+ }
+}
+
 function animate(){
  requestAnimationFrame(animate);
  const dt=Math.min(clock.getDelta(),.04);
  elapsed+=dt;
  crystal.rotation.y+=dt*.7;
- crystal.position.y=1.2+Math.sin(elapsed*2)*.12;
+ crystal.position.y=1.15+Math.sin(elapsed*2)*.12;
 
  attackCD=Math.max(0,attackCD-dt);
  powerCD=Math.max(0,powerCD-dt);
  invulnerable=Math.max(0,invulnerable-dt);
 
- const j=player.userData.joints;
+ let moving=false;
 
  if(started&&hp>0){
   let x=joyX,y=joyY;
@@ -402,80 +477,60 @@ function animate(){
   if(keys.d||keys.arrowright)x+=1;
   if(keys.w||keys.arrowup)y-=1;
   if(keys.s||keys.arrowdown)y+=1;
-  const length=Math.hypot(x,y);
-  if(length>1){x/=length;y/=length;}
+  const len=Math.hypot(x,y);
+  if(len>1){x/=len;y/=len;}
+  moving=len>.08;
 
-  const moving=length>.08;
   if(moving){
-   player.position.x+=x*5.2*dt;
-   player.position.z+=y*5.2*dt;
+   player.position.x+=x*5.1*dt;
+   player.position.z+=y*5.1*dt;
    player.rotation.y=Math.atan2(-x,-y);
    walkTime+=dt*10;
-  }else{
-   walkTime+=dt*2;
   }
 
   player.position.x=THREE.MathUtils.clamp(player.position.x,-42,42);
-  player.position.z=THREE.MathUtils.clamp(player.position.z,-45,32);
+  player.position.z=THREE.MathUtils.clamp(player.position.z,-48,34);
 
-  // Jump arc and landing.
   jumpV-=17*dt;
   player.position.y+=jumpV*dt;
   if(player.position.y<=0){
    player.position.y=0;jumpV=0;grounded=true;
   }
 
-  // Procedural walk cycle: arms, legs, head and torso.
-  const speed=moving?1:0;
-  const swing=Math.sin(walkTime)*.62*speed;
-  j.legs[0].rotation.x=swing;
-  j.legs[1].rotation.x=-swing;
-  j.arms[0].arm.rotation.x=-swing*.7;
-  j.arms[1].arm.rotation.x=swing*.7;
-  j.body.position.y=1.28+Math.abs(Math.sin(walkTime*2))*.035*speed;
-  j.head.rotation.z=Math.sin(elapsed*1.5)*.025;
-  j.body.rotation.x=THREE.MathUtils.lerp(j.body.rotation.x,0,dt*5);
+  animateCharacter(player,dt,moving,0);
 
-  // Return weapon to neutral position after the strike.
-  if(attackCD===0&&powerCD===0){
-   j.weapon.rotation.x=THREE.MathUtils.lerp(j.weapon.rotation.x,0,dt*8);
-   j.arms[1].arm.rotation.x=THREE.MathUtils.lerp(j.arms[1].arm.rotation.x,0,dt*8);
-  }
-
-  // Enemy pursuit and attack animations.
+  // Enemy movement and counterattacks.
   for(const e of enemies){
    if(!e.visible)continue;
    const d=new THREE.Vector3().subVectors(player.position,e.position);
    d.y=0;
    const distance=d.length();
-   const ej=e.userData.joints;
-   e.userData.phase+=dt*5;
+   let enemyMoving=false;
 
    if(distance>1.65&&distance<40){
     d.normalize();
-    e.position.addScaledVector(d,1.25*dt);
+    e.position.addScaledVector(d,1.2*dt);
     e.rotation.y=Math.atan2(-d.x,-d.z);
-    ej.legs[0].rotation.x=Math.sin(e.userData.phase)*.45;
-    ej.legs[1].rotation.x=-Math.sin(e.userData.phase)*.45;
-    ej.arms[0].arm.rotation.x=-Math.sin(e.userData.phase)*.25;
-    ej.arms[1].arm.rotation.x=Math.sin(e.userData.phase)*.25;
+    enemyMoving=true;
    }else if(distance<=1.8){
     e.userData.attackTimer-=dt;
     if(e.userData.attackTimer<=0&&invulnerable<=0){
      hp=Math.max(0,hp-7);
-     invulnerable=.55;
-     e.userData.attackTimer=1.1;
-     ej.arms[1].arm.rotation.x=-1.3;
-     message.textContent=hp>0?'Enemy strike!':'You are defeated — refresh to restart';
+     invulnerable=.6;
+     e.userData.attackTimer=1.15;
+     setAction(e,'attack',.3);
+     msg.textContent=hp>0?'Enemy hit you!':'Defeated! Refresh to restart.';
      updateHUD();
     }
    }
+   animateCharacter(e,dt,enemyMoving,1);
   }
+ }else{
+  animateCharacter(player,dt,false,0);
  }
 
- // Smooth third-person camera.
  lookAt.set(player.position.x,player.position.y+1.25,player.position.z);
- camTarget.set(player.position.x,player.position.y+4.0,player.position.z+7.8);
+ camTarget.set(player.position.x,player.position.y+4.0,player.position.z+7.6);
  camera.position.lerp(camTarget,1-Math.exp(-4.5*dt));
  camera.lookAt(lookAt);
  renderer.render(scene,camera);
