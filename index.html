@@ -1,253 +1,54 @@
- 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Galaxy Animation</title>
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Jade Winds - 3D Mobile Prototype</title>
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  overflow: hidden;
-  background: #02010c;
-  font-family: Arial, sans-serif;
-  color: white;
-}
-
-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.title {
-  position: fixed;
-  top: 9%;
-  width: 100%;
-  text-align: center;
-  z-index: 2;
-  pointer-events: none;
-}
-
-h1 {
-  font-size: clamp(30px, 8vw, 60px);
-  letter-spacing: 5px;
-  background: linear-gradient(
-    90deg, #55eaff, #c58aff, #ff7be5, #55eaff
-  );
-  background-size: 300%;
-  color: transparent;
-  background-clip: text;
-  -webkit-background-clip: text;
-  animation: glow 5s linear infinite;
-  text-shadow: 0 0 30px #754cff55;
-}
-
-p {
-  margin-top: 12px;
-  color: #c9c6ff;
-  letter-spacing: 3px;
-  font-size: 12px;
-}
-
-@keyframes glow {
-  to { background-position: 300%; }
-}
-
-.controls {
-  position: fixed;
-  bottom: 30px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  z-index: 3;
-}
-
-button {
-  padding: 12px 20px;
-  border: 1px solid #8b7bff;
-  border-radius: 30px;
-  color: white;
-  background: #211746aa;
-  font-size: 14px;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-}
-
-button:active {
-  background: #754cff;
-}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#8bc5df;color:white;font-family:Arial,sans-serif;touch-action:none}
+canvas{display:block;width:100%;height:100%}
+#hud{position:fixed;top:10px;left:10px;background:#10202dcc;padding:10px;border-radius:10px;font-size:13px}
+#stick{position:fixed;left:22px;bottom:22px;width:110px;height:110px;border-radius:50%;background:#ffffff30;border:2px solid #ffffff90;touch-action:none}
+#knob{position:absolute;left:31px;top:31px;width:44px;height:44px;border-radius:50%;background:#ffffffc9}
+.btn{position:fixed;right:20px;border:1px solid white;border-radius:50%;color:white;font-weight:bold;background:#9a352fdd;touch-action:none}
+#attack{width:76px;height:76px;bottom:28px}#jump{width:58px;height:58px;bottom:115px;right:95px;background:#236f9ddd}
+#intro{position:fixed;inset:0;background:#071522cc;display:grid;place-items:center;text-align:center;padding:20px}
+#card{max-width:340px;background:#142432;padding:22px;border-radius:16px}
+button{padding:12px 22px;border:0;border-radius:10px;background:#52d18a;font-weight:bold}
 </style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.module.js"}}</script>
 </head>
-
 <body>
-<canvas id="space"></canvas>
-
-<div class="title">
-  <h1>GALAXY</h1>
-  <p>EXPLORE THE INFINITE UNIVERSE</p>
-</div>
-
-<div class="controls">
-  <button id="pause">⏸ Pause</button>
-  <button id="speed">⚡ Speed</button>
-  <button id="stars">✨ More Stars</button>
-</div>
-
-<script>
-const canvas = document.getElementById("space");
-const ctx = canvas.getContext("2d");
-
-let w, h, cx, cy;
-let particles = [];
-let starCount = 450;
-let paused = false;
-let speed = 1;
-let angle = 0;
-
-function resize() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  w = innerWidth;
-  h = innerHeight;
-  canvas.width = w * dpr;
-  canvas.height = h * dpr;
-  canvas.style.width = w + "px";
-  canvas.style.height = h + "px";
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  cx = w / 2;
-  cy = h / 2;
-  createStars();
-}
-
-function createStars() {
-  particles = [];
-  for (let i = 0; i < starCount; i++) {
-    particles.push({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      r: Math.random() * 1.7 + 0.2,
-      a: Math.random(),
-      twinkle: Math.random() * 0.04 + 0.005
-    });
-  }
-}
-
-function background() {
-  const bg = ctx.createRadialGradient(
-    cx, cy, 0, cx, cy, Math.max(w, h) * 0.8
-  );
-  bg.addColorStop(0, "#17113c");
-  bg.addColorStop(0.45, "#09051d");
-  bg.addColorStop(1, "#010108");
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
-}
-
-function drawGalaxy() {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(angle);
-
-  // Nebula glow
-  for (let i = 0; i < 5; i++) {
-    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 100 + i * 35);
-    g.addColorStop(0, "#000000");
-    g.addColorStop(0.2, "#4e2cff22");
-    g.addColorStop(0.55, "#e53bff12");
-    g.addColorStop(1, "#00d9ff00");
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(0, 0, 100 + i * 35, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Spiral galaxy arms
-  for (let arm = 0; arm < 4; arm++) {
-    for (let i = 0; i < 1000; i++) {
-      const t = i / 1000;
-      const radius = 12 + t * Math.min(w, h) * 0.43;
-      const a = t * 8 + arm * Math.PI / 2;
-      const spread = (Math.random() - 0.5) * 0.025;
-      const x = Math.cos(a + spread) * radius;
-      const y = Math.sin(a + spread) * radius * 0.48;
-
-      ctx.fillStyle = i % 3 === 0
-        ? "rgba(91,220,255,0.7)"
-        : i % 3 === 1
-        ? "rgba(218,128,255,0.65)"
-        : "rgba(255,255,255,0.7)";
-
-      ctx.beginPath();
-      ctx.arc(x, y, Math.random() * 1.5 + 0.2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  // Bright galactic core
-  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, 55);
-  core.addColorStop(0, "#ffffff");
-  core.addColorStop(0.08, "#fff4c4");
-  core.addColorStop(0.25, "#c99aff");
-  core.addColorStop(0.55, "#744aff55");
-  core.addColorStop(1, "#744aff00");
-  ctx.fillStyle = core;
-  ctx.beginPath();
-  ctx.arc(0, 0, 55, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.restore();
-}
-
-function drawStars() {
-  for (const s of particles) {
-    s.a += s.twinkle;
-    const opacity = 0.3 + Math.abs(Math.sin(s.a)) * 0.7;
-    ctx.fillStyle = `rgba(220,235,255,${opacity})`;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
-
-function animate() {
-  if (!paused) {
-    background();
-    drawStars();
-    drawGalaxy();
-    angle += 0.002 * speed;
-  }
-  requestAnimationFrame(animate);
-}
-
-document.getElementById("pause").onclick = function() {
-  paused = !paused;
-  this.textContent = paused ? "▶ Play" : "⏸ Pause";
-};
-
-document.getElementById("speed").onclick = function() {
-  speed = speed === 1 ? 3 : speed === 3 ? 6 : 1;
-  this.textContent = "⚡ Speed " + speed + "x";
-};
-
-document.getElementById("stars").onclick = function() {
-  starCount = starCount === 450 ? 1000 : 450;
-  createStars();
-  this.textContent = starCount === 450
-    ? "✨ More Stars" : "✨ Fewer Stars";
-};
-
-window.addEventListener("resize", resize);
-resize();
-animate();
+<div id="hud"><b>JADE WINDS</b><br>HP: <span id="hp">100</span> · Defeated: <span id="kills">0</span><br><small>Move joystick · Attack red · Jump blue</small></div>
+<div id="stick"><div id="knob"></div></div><button id="jump" class="btn">JUMP</button><button id="attack" class="btn">ATTACK</button>
+<div id="intro"><div id="card"><h1>JADE WINDS</h1><p>Mobile 3D fantasy combat prototype. Camera, world, player, enemies and touch controls are created by code.</p><button id="play">PLAY GAME</button></div></div>
+<script type="module">
+import * as THREE from 'three';
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x8bc5df);scene.fog=new THREE.Fog(0x8bc5df,35,110);
+const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,180);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xdaf2ff,0x405333,2));const sun=new THREE.DirectionalLight(0xffe7c2,2);sun.position.set(-15,25,10);scene.add(sun);
+const material=c=>new THREE.MeshStandardMaterial({color:c});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(180,180),material(0x537f45));ground.rotation.x=-Math.PI/2;ground.position.y=-.1;scene.add(ground);
+const path=new THREE.Mesh(new THREE.PlaneGeometry(7,100),material(0x9a8964));path.rotation.x=-Math.PI/2;path.position.set(0,-.08,-18);scene.add(path);
+for(let i=0;i<18;i++){let h=new THREE.Mesh(new THREE.SphereGeometry(1,12,8),material(i%2?0x5f8c65:0x739b70));h.scale.set(7+Math.random()*8,3+Math.random()*4,8+Math.random()*7);h.position.set((Math.random()-.5)*110,-1,-45-Math.random()*55);scene.add(h)}
+for(let i=0;i<65;i++){let x=(Math.random()-.5)*90,z=(Math.random()-.5)*95;if(Math.abs(x)<5&&z<8&&z>-45)continue;let t=new THREE.Mesh(new THREE.CylinderGeometry(.15,.25,1.7,7),material(0x60432b));t.position.set(x,.8,z);scene.add(t);let l=new THREE.Mesh(new THREE.ConeGeometry(1.1,3.1,7),material(0x2d7045));l.position.set(x,2.7,z);scene.add(l)}
+function warrior(color,enemy=false){let g=new THREE.Group();const add=(geo,c,x,y,z)=>{let m=new THREE.Mesh(geo,material(c));m.position.set(x,y,z);g.add(m);return m};add(new THREE.CapsuleGeometry(.34,.65,4,8),color,0,1.15,0);add(new THREE.SphereGeometry(.27,12,10),0xd5a57b,0,1.85,0);add(new THREE.SphereGeometry(.28,10,8),enemy?0x20252a:0x171717,0,2.03,0);add(new THREE.BoxGeometry(.68,.13,.4),enemy?0xb94a36:0xe2c45e,0,.9,0);for(let s of [-1,1]){add(new THREE.CapsuleGeometry(.13,.4,3,6),color,s*.44,1.25,0);add(new THREE.CapsuleGeometry(.15,.4,3,6),0x29323c,s*.18,.4,0)}add(new THREE.BoxGeometry(.08,.7,.12),0xdde5ed,.62,1.18,0);g.userData={hp:100};return g}
+const player=warrior(0x2466a8);player.position.set(0,0,4);scene.add(player);
+let enemies=[];for(let i=0;i<3;i++){let e=warrior([0x9c3f32,0x7f3d83,0x9b6b2d][i],true);e.position.set((i-1)*4,0,-5-i*5);e.userData.cool=0;scene.add(e);enemies.push(e)}
+let hp=100,kills=0,started=false,jumpV=0,grounded=true,attackCool=0,invuln=0;const hpEl=document.querySelector('#hp'),killEl=document.querySelector('#kills');
+let joy={x:0,y:0},pid=null;const stick=document.querySelector('#stick'),knob=document.querySelector('#knob');
+function joySet(e){let r=stick.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),len=Math.hypot(dx,dy),max=36;if(len>max){dx=dx/len*max;dy=dy/len*max}joy={x:dx/max,y:dy/max};knob.style.transform=`translate(${dx}px,${dy}px)`}
+function joyReset(){joy={x:0,y:0};pid=null;knob.style.transform='translate(0,0)'}
+stick.onpointerdown=e=>{e.preventDefault();pid=e.pointerId;stick.setPointerCapture(pid);joySet(e)};stick.onpointermove=e=>{if(e.pointerId===pid)joySet(e)};stick.onpointerup=joyReset;stick.onpointercancel=joyReset;
+function attack(){if(attackCool>0||hp<=0)return;attackCool=.45;let hit=false;for(let e of enemies){if(!e.visible)continue;if(e.position.distanceTo(player.position)<2.5){e.userData.hp-=35;hit=true;if(e.userData.hp<=0){e.visible=false;kills++;killEl.textContent=kills}}}}
+document.querySelector('#attack').onpointerdown=e=>{e.preventDefault();attack()};document.querySelector('#jump').onpointerdown=e=>{e.preventDefault();if(grounded){jumpV=6.5;grounded=false}};
+document.querySelector('#play').onclick=()=>{started=true;document.querySelector('#intro').style.display='none'};
+let keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space'&&grounded){jumpV=6.5;grounded=false}if(e.key.toLowerCase()==='f')attack()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+const clock=new THREE.Clock(),target=new THREE.Vector3(),camPos=new THREE.Vector3();
+function frame(){requestAnimationFrame(frame);let dt=Math.min(clock.getDelta(),.04);if(started&&hp>0){attackCool=Math.max(0,attackCool-dt);invuln=Math.max(0,invuln-dt);let x=joy.x,y=joy.y;if(keys.a||keys.arrowleft)x-=1;if(keys.d||keys.arrowright)x+=1;if(keys.w||keys.arrowup)y-=1;if(keys.s||keys.arrowdown)y+=1;let len=Math.hypot(x,y);if(len>1){x/=len;y/=len}if(len>.08){player.position.x+=x*5*dt;player.position.z+=y*5*dt;player.rotation.y=Math.atan2(-x,-y)}player.position.x=THREE.MathUtils.clamp(player.position.x,-40,40);player.position.z=THREE.MathUtils.clamp(player.position.z,-45,30);jumpV-=16*dt;player.position.y+=jumpV*dt;if(player.position.y<=0){player.position.y=0;jumpV=0;grounded=true}
+for(let e of enemies){if(!e.visible)continue;let d=new THREE.Vector3().subVectors(player.position,e.position);d.y=0;let dist=d.length();if(dist>1.5&&dist<35){d.normalize();e.position.addScaledVector(d,1.25*dt);e.rotation.y=Math.atan2(-d.x,-d.z)}else if(dist<=1.6){e.userData.cool-=dt;if(e.userData.cool<=0&&invuln<=0){hp=Math.max(0,hp-7);invuln=.7;e.userData.cool=1.2;hpEl.textContent=hp}}}}
+target.set(player.position.x,player.position.y+1.25,player.position.z);camPos.set(player.position.x,player.position.y+4.2,player.position.z+7.8);camera.position.lerp(camPos,1-Math.exp(-5*dt));camera.lookAt(target);renderer.render(scene,camera)}
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});frame();
 </script>
-</body>
-</html>
+</body></html>
