@@ -1,550 +1,545 @@
-
+ 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Jade Winds - Warrior Upgrade</title>
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.module.js"}}
-</script>
+<title>Jade Winds - Shadow Combat</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:#8fb8c9;color:white;font-family:Arial;touch-action:none}
-canvas{display:block}
-#hud{position:fixed;top:9px;left:9px;z-index:2;background:#101a25e8;border:1px solid #9de7cf66;padding:10px;border-radius:11px;font-size:12px}
-#hpbar{height:8px;width:150px;background:#55ed91;border-radius:8px;margin-top:5px}
-#hpbg{height:8px;width:150px;background:#552525;border-radius:8px;overflow:hidden}
-#stick{position:fixed;z-index:3;bottom:20px;left:20px;width:110px;height:110px;border:2px solid #ffffff99;background:#ffffff20;border-radius:50%;touch-action:none}
-#knob{position:absolute;left:32px;top:32px;width:42px;height:42px;background:#ffffffdf;border-radius:50%}
-.btn{position:fixed;z-index:3;border:2px solid #ffffff9c;border-radius:50%;font-size:10px;font-weight:bold;color:white;touch-action:none}
-#attack{right:17px;bottom:23px;width:75px;height:75px;background:#ad3038}
-#power{right:18px;bottom:106px;width:58px;height:58px;background:#a26b24}
-#jump{right:85px;bottom:106px;width:58px;height:58px;background:#217ca8}
-#msg{position:fixed;bottom:153px;left:50%;transform:translateX(-50%);z-index:2;background:#101820ce;padding:8px 11px;border-radius:12px;font-size:11px;white-space:nowrap}
-#intro{position:fixed;inset:0;z-index:5;background:linear-gradient(#0d293bd9,#08121df5);display:grid;place-items:center;text-align:center;padding:20px}
-#card{max-width:340px;padding:25px;background:#162b3a;border:1px solid #a5ebd488;border-radius:20px}
-h1{color:#a5f2d0;letter-spacing:3px}
-#play{background:#63e5a2;padding:13px 25px;border:0;border-radius:9px;font-weight:bold}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080e1b;color:#fff;font-family:Arial,sans-serif;touch-action:none}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#hud{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:8px;align-items:center;z-index:2}
+.panel{background:#101b2be8;border:1px solid #80dbc477;border-radius:10px;padding:8px;flex:1;min-width:0}
+.name{font-size:11px;font-weight:bold;letter-spacing:1px;margin-bottom:5px}
+.track{height:12px;background:#45252f;border-radius:9px;overflow:hidden}
+.fill{height:100%;width:100%;background:linear-gradient(90deg,#24d98a,#a2ffb9);transition:width .15s}
+#enemyFill{background:linear-gradient(90deg,#ff434e,#ffb14e)}
+#round{position:absolute;top:82px;left:0;right:0;text-align:center;color:#d7e9ff;font-size:12px;letter-spacing:2px;text-shadow:0 2px 4px #000}
+#message{position:absolute;top:30%;left:0;right:0;text-align:center;font-size:22px;font-weight:bold;color:#c5ffe5;text-shadow:0 0 16px #42ffc4;pointer-events:none}
+#controls{position:absolute;bottom:16px;left:12px;right:12px;display:flex;align-items:end;justify-content:space-between;gap:8px;z-index:3}
+#movement{display:grid;grid-template-columns:54px 54px 54px;grid-template-rows:54px 54px;gap:5px}
+button{color:white;font-weight:bold;border:1px solid #ffffff50;background:#15273bdf;box-shadow:0 4px 0 #050a11;border-radius:13px;touch-action:none;user-select:none;-webkit-user-select:none}
+button:active,.held{filter:brightness(1.5);transform:translateY(2px);box-shadow:0 2px 0 #050a11}
+.move{font-size:21px}
+#left{grid-column:1;grid-row:2}
+#right{grid-column:3;grid-row:2}
+#up{grid-column:2;grid-row:1}
+#down{grid-column:2;grid-row:2;font-size:11px}
+#fight{display:grid;grid-template-columns:repeat(2,61px);gap:8px}
+.action{height:57px;font-size:11px;border-radius:50%;background:#163d49}
+#punch{background:#176c61}
+#kick{background:#8c433b}
+#staff{background:#5e498e}
+#block{background:#344f71}
+#hint{position:absolute;bottom:143px;left:0;right:0;text-align:center;color:#c8d6e9;font-size:10px;pointer-events:none}
+#start{position:absolute;inset:0;z-index:5;display:grid;place-items:center;background:linear-gradient(#101b2beF,#070a15f5);padding:20px}
+#startbox{width:min(330px,90vw);text-align:center;padding:26px 20px;background:#111d30;border:1px solid #4fe2bf88;border-radius:20px;box-shadow:0 0 50px #0e8f7a22}
+h1{font-size:27px;letter-spacing:4px;color:#a0ffdf;margin:0 0 7px}
+#startbox p{color:#cfdae8;font-size:13px;line-height:1.6}
+#play{background:#55e8b2;color:#07151b;border:0;padding:14px 24px;border-radius:10px;margin-top:9px}
+@media(min-width:700px){
+ #controls{left:calc(50% - 330px);right:calc(50% - 330px)}
+ #movement{grid-template-columns:62px 62px 62px;grid-template-rows:62px 62px}
+ #fight{grid-template-columns:repeat(2,70px)}
+ .action{height:65px}
+}
 </style>
 </head>
 <body>
+<canvas id="game"></canvas>
+
 <div id="hud">
-<b style="color:#a5f2d0;letter-spacing:2px">JADE WINDS</b><br>
-HP: <span id="hp">100</span>/100
-<div id="hpbg"><div id="hpbar"></div></div>
-Defeated: <span id="kills">0</span>/3
+ <div class="panel">
+  <div class="name">JADE WARRIOR</div>
+  <div class="track"><div class="fill" id="playerFill"></div></div>
+ </div>
+ <div style="font-size:12px;font-weight:bold;color:#a4ffdf">VS</div>
+ <div class="panel">
+  <div class="name" style="text-align:right">SHADOW RONIN</div>
+  <div class="track"><div class="fill" id="enemyFill"></div></div>
+ </div>
 </div>
-<div id="stick"><div id="knob"></div></div>
-<button id="attack" class="btn">ATTACK</button>
-<button id="power" class="btn">POWER</button>
-<button id="jump" class="btn">JUMP</button>
-<div id="msg">Enter the forest and defeat the warriors</div>
-<div id="intro"><div id="card">
-<h1>JADE WINDS</h1>
-<p>WARRIOR COMBAT</p>
-<p>Explore the ancient forest, master your staff and defeat three enemy warriors.</p>
-<p>Move with the joystick. Use ATTACK, POWER and JUMP.</p>
-<button id="play">ENTER THE FOREST</button>
-</div></div>
+<div id="round">ROUND 1 · DEFEAT YOUR ENEMY</div>
+<div id="message"></div>
 
-<script type="module">
-import * as THREE from 'three';
+<div id="hint">MOVE · JUMP · PUNCH + KICK COMBOS · HOLD BLOCK</div>
+<div id="controls">
+ <div id="movement">
+  <button class="move" id="left">◀</button>
+  <button class="move" id="up">▲</button>
+  <button class="move" id="right">▶</button>
+  <button id="down">CROUCH</button>
+ </div>
+ <div id="fight">
+  <button class="action" id="punch">PUNCH</button>
+  <button class="action" id="kick">KICK</button>
+  <button class="action" id="staff">STAFF</button>
+  <button class="action" id="block">BLOCK</button>
+ </div>
+</div>
 
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x9fc9dc);
-scene.fog=new THREE.Fog(0x9fc9dc,48,145);
+<div id="start">
+ <div id="startbox">
+  <h1>JADE WINDS</h1>
+  <div style="color:#70e9cb;letter-spacing:3px;font-size:11px">SHADOW COMBAT</div>
+  <p>Enter the ancient arena. Master punches, kicks, staff strikes and blocks. Defeat the Shadow Ronin.</p>
+  <p>Original silhouette fighting game · Mobile ready</p>
+  <button id="play">START FIGHT</button>
+ </div>
+</div>
 
-const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,220);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.12;
-document.body.appendChild(renderer.domElement);
+<script>
+(()=>{
+'use strict';
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id);
 
-scene.add(new THREE.HemisphereLight(0xe4f5ff,0x3e4931,2.2));
-const sun=new THREE.DirectionalLight(0xffdfad,3);
-sun.position.set(-25,38,24);
-scene.add(sun);
-const rim=new THREE.DirectionalLight(0x75c9ff,1.15);
-rim.position.set(20,14,-24);
-scene.add(rim);
-
-const mat=(c,r=.75,m=0)=>new THREE.MeshStandardMaterial({
- color:c,roughness:r,metalness:m
-});
-const groundMat=mat(0x62864b);
-const barkMat=mat(0x573925);
-const stoneMat=mat(0x777e7c);
-const goldMat=mat(0xe0ba66,.32,.65);
-const jadeMat=mat(0x16a987,.28,.25);
-
-function addMesh(parent,geometry,material,x=0,y=0,z=0){
- const o=new THREE.Mesh(geometry,material);
- o.position.set(x,y,z);
- parent.add(o);
- return o;
+let W=innerWidth,H=innerHeight,DPR=1;
+function resize(){
+ W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,1.5);
+ canvas.width=Math.round(W*DPR);canvas.height=Math.round(H*DPR);
+ canvas.style.width=W+'px';canvas.style.height=H+'px';
+ ctx.setTransform(DPR,0,0,DPR,0,0);
 }
+addEventListener('resize',resize);resize();
 
-// Environment
-const ground=addMesh(scene,new THREE.PlaneGeometry(190,190),groundMat,0,-.12,0);
-ground.rotation.x=-Math.PI/2;
+let running=false,over=false,elapsed=0,last=0,shake=0;
+let particles=[],floatTexts=[],combo=0,comboTime=0;
+const input={left:false,right:false,jump:false,crouch:false,block:false};
+const floorY=()=>H*.70;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
-for(let i=0;i<125;i++){
- const x=(Math.random()-.5)*100;
- const z=(Math.random()-.5)*115;
- if(Math.abs(x)<5&&z<15&&z>-38)continue;
- const tree=new THREE.Group();
- const h=2.7+Math.random()*2.3;
- addMesh(tree,new THREE.CylinderGeometry(.15,.31,h,8),barkMat,0,h/2,0);
- for(let j=0;j<3;j++){
-  addMesh(tree,new THREE.ConeGeometry(1.3-j*.18,1.8,8),
-   mat([0x235439,0x327247,0x46824b][j]),0,h*.55+j*.72,0);
- }
- tree.position.set(x,0,z);
- tree.rotation.y=Math.random()*6;
- scene.add(tree);
-}
-
-for(let i=0;i<28;i++){
- const h=10+Math.random()*13;
- const m=addMesh(scene,new THREE.ConeGeometry(h*.8,h,7),
-  mat(i%2?0x6e918a:0x5b7d7d),
-  (Math.random()-.5)*125,h*.4,-48-Math.random()*60);
- m.scale.z=1.35;
-}
-
-for(let i=0;i<45;i++){
- const rock=addMesh(scene,new THREE.DodecahedronGeometry(.4+Math.random()*.8),
-  stoneMat,(Math.random()-.5)*90,.1,(Math.random()-.5)*95);
- rock.scale.y=.55+Math.random()*.5;
- rock.rotation.set(Math.random(),Math.random(),Math.random());
-}
-
-// Procedurally built character. No external model files.
-function makeWarrior(enemy=false,color=0x167765){
- const root=new THREE.Group();
- const clothes=mat(color,.64);
- const armor=mat(enemy?0x553d38:0x244653,.4,.28);
- const darkCloth=mat(enemy?0x422927:0x143b34);
- const hair=mat(0x171a20,.8);
- const skin=mat(enemy?0xa96848:0xc88962);
- const metal=mat(enemy?0x9a5a38:0x31bfa0,.3,.35);
- const joints={legs:[],arms:[]};
-
- // Lower body: upper legs, knees, boots.
- for(const side of [-1,1]){
-  const leg=new THREE.Group();
-  leg.position.set(side*.19,.79,0);
-  root.add(leg);
-  joints.legs.push(leg);
-  addMesh(leg,new THREE.CapsuleGeometry(.14,.35,4,9),clothes,0,-.18,0);
-  addMesh(leg,new THREE.SphereGeometry(.145,12,10),armor,0,-.37,0);
-  addMesh(leg,new THREE.BoxGeometry(.30,.16,.40),darkCloth,0,-.48,-.06);
-  addMesh(leg,new THREE.BoxGeometry(.30,.055,.13),goldMat,0,-.37,.10);
- }
-
- // Torso pivot.
- const body=new THREE.Group();
- body.position.y=1.30;
- root.add(body);
- joints.body=body;
-
- addMesh(body,new THREE.CapsuleGeometry(.32,.48,5,12),clothes);
- addMesh(body,new THREE.BoxGeometry(.66,.20,.43),armor,0,-.20,0);
- addMesh(body,new THREE.BoxGeometry(.72,.10,.46),darkCloth,0,-.34,0);
- addMesh(body,new THREE.BoxGeometry(.70,.07,.47),goldMat,0,-.39,0);
-
- // Chest armor: layered plates.
- for(let i=0;i<3;i++){
-  const plate=addMesh(body,new THREE.BoxGeometry(.48,.13,.09),armor,0,.14-i*.16,.25);
-  plate.rotation.x=-.10;
-  addMesh(body,new THREE.BoxGeometry(.50,.025,.025),goldMat,0,.19-i*.16,.305);
- }
- addMesh(body,new THREE.SphereGeometry(.10,14,12),metal,0,.10,.33);
-
- // Neck.
- addMesh(body,new THREE.CylinderGeometry(.10,.12,.18,12),skin,0,.47,0);
-
- // Head with face, brows, eyes, nose, beard and tied hair.
- const head=new THREE.Group();
- head.position.set(0,.68,0);
- body.add(head);
- joints.head=head;
-
- addMesh(head,new THREE.SphereGeometry(.245,20,16),skin);
- for(const side of [-1,1]){
-  addMesh(head,new THREE.SphereGeometry(.055,10,8),skin,side*.235,0,0);
-  addMesh(head,new THREE.SphereGeometry(.030,10,8),mat(0x111318),side*.083,.035,.218);
-  addMesh(head,new THREE.BoxGeometry(.085,.025,.025),hair,side*.083,.087,.22);
- }
- addMesh(head,new THREE.ConeGeometry(.045,.13,8),skin,0,-.035,.24);
-
- const beard=addMesh(head,new THREE.ConeGeometry(.13,.20,8),hair,0,-.19,.10);
- beard.rotation.x=-.12;
-
- const cap=addMesh(head,new THREE.SphereGeometry(.26,16,12),hair,0,.13,-.025);
- cap.scale.set(1,.54,1);
- addMesh(head,new THREE.ConeGeometry(.085,.32,9),hair,0,.34,-.04);
- const pony=addMesh(head,new THREE.CapsuleGeometry(.065,.38,4,8),hair,0,.06,-.29);
- pony.rotation.x=-.65;
-
- const band=addMesh(head,new THREE.TorusGeometry(.233,.032,8,24),goldMat,0,.095,0);
- band.rotation.x=.05;
-
- // Shoulder pads and articulated arms.
- for(const side of [-1,1]){
-  const shoulder=addMesh(body,new THREE.SphereGeometry(.205,14,10),armor,side*.43,.23,0);
-  shoulder.scale.set(1,.72,1);
-  addMesh(body,new THREE.BoxGeometry(.16,.07,.30),goldMat,side*.44,.15,0);
- }
-
- for(const side of [-1,1]){
-  const arm=new THREE.Group();
-  arm.position.set(side*.43,.25,0);
-  body.add(arm);
-
-  addMesh(arm,new THREE.CapsuleGeometry(.12,.27,4,9),clothes,0,-.17,0);
-  addMesh(arm,new THREE.SphereGeometry(.125,12,10),armor,0,-.36,0);
-
-  const forearm=new THREE.Group();
-  forearm.position.y=-.37;
-  arm.add(forearm);
-  addMesh(forearm,new THREE.CapsuleGeometry(.095,.22,4,9),skin,0,-.12,0);
-  addMesh(forearm,new THREE.BoxGeometry(.21,.19,.17),armor,0,-.14,.055);
-  addMesh(forearm,new THREE.TorusGeometry(.105,.023,7,16),goldMat,0,-.25,0);
-  addMesh(forearm,new THREE.SphereGeometry(.10,12,10),skin,0,-.29,0);
-
-  joints.arms.push({arm,forearm});
- }
-
- // Belt and hanging cloth panels.
- addMesh(body,new THREE.TorusGeometry(.31,.045,8,24),goldMat,0,-.44,0);
- for(const side of [-1,1]){
-  const panel=addMesh(body,new THREE.BoxGeometry(.21,.42,.075),darkCloth,side*.21,-.64,.07);
-  panel.rotation.z=side*.13;
-  addMesh(body,new THREE.BoxGeometry(.21,.045,.085),goldMat,side*.21,-.43,.09);
- }
-
- // Staff with metal caps.
- const weapon=new THREE.Group();
- weapon.position.set(.54,-.59,.03);
- weapon.rotation.z=-.18;
- body.add(weapon);
- joints.weapon=weapon;
- addMesh(weapon,new THREE.CylinderGeometry(.035,.05,1.38,10),
-  mat(0x80532e,.42),0,-.13,0);
- for(const y of [-.72,.46]){
-  addMesh(weapon,new THREE.CylinderGeometry(.065,.065,.09,10),goldMat,0,y,0);
- }
- addMesh(weapon,new THREE.ConeGeometry(.065,.17,9),goldMat,0,.60,0);
-
- // Scabbard on the back.
- const sheath=addMesh(body,new THREE.CylinderGeometry(.045,.06,.85,8),
-  darkCloth,-.23,-.12,-.22);
- sheath.rotation.x=.25;
- sheath.rotation.z=-.20;
-
- root.userData={
-  joints,hp:100,enemy,
-  phase:Math.random()*6,
-  attackTimer:Math.random()*.5,
-  action:'idle',actionTime:0,hitFlash:0
+function fighter(x,isEnemy){
+ return {
+  x,y:0,vx:0,vy:0,face:isEnemy?-1:1,
+  hp:100,maxHp:100,enemy:isEnemy,
+  grounded:true,action:'idle',timer:0,cooldown:0,
+  block:false,crouch:false,attackHit:false,
+  staff:isEnemy,walk:0,flash:0,dead:false
  };
- return root;
 }
+const player=fighter(W*.30,false);
+const enemy=fighter(W*.70,true);
+player.y=0;enemy.y=0;
 
-const player=makeWarrior(false,0x137b67);
-player.position.set(0,0,5);
-scene.add(player);
-
-const enemies=[];
-const enemyColors=[0x87352d,0x584181,0x94702c];
-for(let i=0;i<3;i++){
- const e=makeWarrior(true,enemyColors[i]);
- e.position.set((i-1)*4,0,-5-i*6);
- scene.add(e);
- enemies.push(e);
-}
-
-// Floating jade shrine.
-const shrine=new THREE.Group();
-addMesh(shrine,new THREE.CylinderGeometry(1.15,1.45,.4,8),
- mat(0x737c79),0,.2,0);
-const crystal=addMesh(shrine,new THREE.OctahedronGeometry(.62),
- new THREE.MeshStandardMaterial({
-  color:0x7effdc,emissive:0x087a5a,emissiveIntensity:1.5,
-  metalness:.25,roughness:.2
- }),0,1.15,0);
-shrine.position.set(8,0,-25);
-scene.add(shrine);
-
-// Game state.
-let started=false,hp=100,kills=0;
-let jumpV=0,grounded=true;
-let attackCD=0,powerCD=0,invulnerable=0;
-let elapsed=0,walkTime=0;
-let joyX=0,joyY=0,stickPointer=null;
-const keys={};
-
-const hpText=document.querySelector('#hp');
-const hpBar=document.querySelector('#hpbar');
-const killsText=document.querySelector('#kills');
-const msg=document.querySelector('#msg');
-
-function updateHUD(){
- hpText.textContent=Math.ceil(hp);
- hpBar.style.width=hp+'%';
- hpBar.style.background=hp<30?'#ff5148':'#55ed91';
- killsText.textContent=kills;
-}
-
-function setAction(character,name,duration){
- const u=character.userData;
- u.action=name;
- u.actionTime=duration;
-}
-
-function hitEnemies(damage,range){
- let hit=false;
- for(const e of enemies){
-  if(!e.visible)continue;
-  if(e.position.distanceTo(player.position)<range){
-   e.userData.hp-=damage;
-   setAction(e,'hit',.22);
-   e.userData.hitFlash=.2;
-   hit=true;
-   if(e.userData.hp<=0){
-    e.visible=false;
-    kills++;
-    msg.textContent='Warrior defeated!';
-   }else{
-    msg.textContent=damage>35?'POWER STRIKE!':'Clean hit!';
-   }
-  }
- }
- if(!hit)msg.textContent='Move closer to the enemy';
+function reset(){
+ Object.assign(player,{x:W*.30,y:0,vx:0,vy:0,hp:100,face:1,
+  grounded:true,action:'idle',timer:0,cooldown:0,block:false,
+  crouch:false,attackHit:false,staff:true,walk:0,flash:0,dead:false});
+ Object.assign(enemy,{x:W*.70,y:0,vx:0,vy:0,hp:100,face:-1,
+  grounded:true,action:'idle',timer:0,cooldown:.5,block:false,
+  crouch:false,attackHit:false,staff:true,walk:0,flash:0,dead:false});
+ particles=[];floatTexts=[];combo=0;comboTime=0;shake=0;over=false;
+ $('message').textContent='';
+ $('round').textContent='ROUND 1 · DEFEAT YOUR ENEMY';
  updateHUD();
 }
 
-function attack(power=false){
- if(!started||hp<=0)return;
- if(power){
-  if(powerCD>0)return;
-  powerCD=1.05;
-  setAction(player,'power',.45);
-  hitEnemies(45,3.6);
+function updateHUD(){
+ $('playerFill').style.width=clamp(player.hp,0,100)+'%';
+ $('enemyFill').style.width=clamp(enemy.hp,0,100)+'%';
+}
+
+function showMessage(s){$('message').textContent=s}
+function floatText(x,y,text,color='#d6ffec'){
+ floatTexts.push({x,y,text,color,t:.8});
+}
+function burst(x,y,color,count=10){
+ for(let i=0;i<count;i++){
+  const a=Math.random()*Math.PI*2,s=40+Math.random()*180;
+  particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,
+   t:.25+Math.random()*.4,color,r:2+Math.random()*3});
+ }
+}
+
+function action(f,name,duration){
+ f.action=name;f.timer=duration;f.attackHit=false;
+}
+function attack(type){
+ if(!running||over||player.hp<=0||player.cooldown>0)return;
+ player.block=false;
+ let duration=type==='staff'?.56:type==='kick'?.43:.30;
+ player.cooldown=duration*.65;
+ action(player,type,duration);
+ player.staff=type==='staff';
+ if(type==='punch'){
+  combo=comboTime>0?combo+1:1;comboTime=1.1;
+ }else combo=0;
+}
+
+function damage(attacker,target,type){
+ if(target.hp<=0||target.dead)return;
+ const distance=Math.abs(target.x-attacker.x);
+ const reach=type==='staff'?100:type==='kick'?75:62;
+ if(distance>reach)return;
+ if(attacker.face!==(target.x>attacker.x?1:-1))return;
+
+ if(target.block&&target.grounded){
+  target.hp=Math.max(0,target.hp-2);
+  burst(target.x,targetY(target)-45,'#71cfff',5);
+  floatText(target.x,targetY(target)-65,'BLOCK!','#85dcff');
+  shake=2;updateHUD();return;
+ }
+
+ const dmg=type==='staff'?18:type==='kick'?13:9;
+ target.hp=Math.max(0,target.hp-dmg);
+ target.flash=.15;
+ target.vx=attacker.face*(type==='kick'?220:150);
+ target.vy=-100;
+ action(target,'hit',.20);
+ burst(target.x,targetY(target)-48,'#ffcd76',12);
+ floatText(target.x,targetY(target)-68,'-'+dmg,'#ffe3a2');
+ shake=5;updateHUD();
+
+ if(attacker===player&&combo>=2&&type==='punch'){
+  floatText(player.x, floorY()-105,combo+' HIT COMBO','#9affdf');
+ }
+ if(target.hp<=0){
+  target.dead=true;action(target,'down',1);
+  showMessage(target===enemy?'VICTORY!':'DEFEAT!');
+  $('round').textContent=target===enemy?'SHADOW RONIN DEFEATED':'TRY AGAIN';
+  over=true;
+  setTimeout(()=>{
+   if(over){
+    $('startbox').querySelector('h1').textContent=target===enemy?'VICTORY':'DEFEAT';
+    $('startbox').querySelector('p').textContent=target===enemy?'You mastered the Jade Winds!':'Train again and master your combat skills.';
+    $('play').textContent='FIGHT AGAIN';
+    $('start').style.display='grid';running=false;
+   }
+  },1000);
+ }
+}
+
+function targetY(f){return floorY()-f.y}
+function doEnemyAI(dt){
+ if(enemy.hp<=0)return;
+ enemy.cooldown=Math.max(0,enemy.cooldown-dt);
+ enemy.timer=Math.max(0,enemy.timer-dt);
+ const d=player.x-enemy.x,dist=Math.abs(d);
+ enemy.face=d>=0?1:-1;
+ enemy.block=false;
+
+ if(player.action==='staff'&&dist<115&&Math.random()<.035)enemy.block=true;
+ if(enemy.action!=='idle'&&enemy.timer>0)return;
+ if(enemy.action==='hit'&&enemy.timer<=0)enemy.action='idle';
+
+ if(dist>75){
+  enemy.vx=enemy.face*85;
+  enemy.action='walk';
  }else{
-  if(attackCD>0)return;
-  attackCD=.42;
-  setAction(player,'attack',.32);
-  hitEnemies(24,3.2);
+  enemy.vx=0;
+  if(enemy.cooldown<=0){
+   const r=Math.random();
+   if(r<.24){
+    enemy.block=true;enemy.action='block';enemy.timer=.45;enemy.cooldown=.8;
+   }else{
+    const type=r<.55?'punch':r<.82?'kick':'staff';
+    action(enemy,type,type==='staff'?.55:type==='kick'?.43:.3);
+    enemy.cooldown=.8+Math.random()*.7;
+   }
+  }
  }
 }
 
-document.querySelector('#attack').addEventListener('pointerdown',e=>{
- e.preventDefault();attack(false);
-});
-document.querySelector('#power').addEventListener('pointerdown',e=>{
- e.preventDefault();attack(true);
-});
-document.querySelector('#jump').addEventListener('pointerdown',e=>{
- e.preventDefault();
- if(started&&grounded&&hp>0){
-  jumpV=7;grounded=false;
-  setAction(player,'jump',.25);
+function updateFighter(f,dt){
+ f.cooldown=Math.max(0,f.cooldown-dt);
+ f.flash=Math.max(0,f.flash-dt);
+ f.timer=Math.max(0,f.timer-dt);
+ f.x+=f.vx*dt;
+ f.vx*=Math.pow(.001,dt);
+ if(!f.grounded){f.vy+=850*dt;f.y-=f.vy*dt;
+  if(f.y<=0){f.y=0;f.vy=0;f.grounded=true;}
  }
-});
-
-const stick=document.querySelector('#stick');
-const knob=document.querySelector('#knob');
-
-function setJoystick(e){
- const r=stick.getBoundingClientRect();
- let dx=e.clientX-r.left-r.width/2;
- let dy=e.clientY-r.top-r.height/2;
- const length=Math.hypot(dx,dy),max=35;
- if(length>max){dx=dx/length*max;dy=dy/length*max;}
- joyX=dx/max;joyY=dy/max;
- knob.style.transform=`translate(${dx}px,${dy}px)`;
+ if(f.action==='hit'&&f.timer<=0)f.action='idle';
+ if(['punch','kick','staff'].includes(f.action)&&f.timer>0&&!f.attackHit){
+  const duration=f.action==='staff'?.56:f.action==='kick'?.43:.30;
+  if(f.timer<duration*.65){
+   f.attackHit=true;
+   if(f===player)damage(player,enemy,f.action);
+   else damage(enemy,player,f.action);
+  }
+ }
+ if(f.timer<=0&&['punch','kick','staff','block','hit','walk'].includes(f.action)){
+  f.action='idle';f.block=false;
+ }
+ f.x=clamp(f.x,25,W-25);
 }
-function resetJoystick(){
- joyX=0;joyY=0;stickPointer=null;
- knob.style.transform='translate(0,0)';
+
+function jump(){
+ if(!running||over||!player.grounded)return;
+ player.grounded=false;player.vy=330;
+ player.action='jump';player.timer=.3;
 }
-stick.addEventListener('pointerdown',e=>{
- e.preventDefault();stickPointer=e.pointerId;
- stick.setPointerCapture(e.pointerId);setJoystick(e);
+
+const held=new Set();
+function bindHold(id,down,up){
+ const el=$(id);
+ const start=e=>{
+  e.preventDefault();held.add(id);el.classList.add('held');down();
+ };
+ const end=e=>{
+  e.preventDefault();held.delete(id);el.classList.remove('held');if(up)up();
+ };
+ el.addEventListener('pointerdown',start);
+ el.addEventListener('pointerup',end);
+ el.addEventListener('pointercancel',end);
+ el.addEventListener('lostpointercapture',end);
+}
+bindHold('left',()=>input.left=true,()=>input.left=false);
+bindHold('right',()=>input.right=true,()=>input.right=false);
+bindHold('up',jump);
+bindHold('down',()=>input.crouch=true,()=>input.crouch=false);
+bindHold('punch',()=>attack('punch'));
+bindHold('kick',()=>attack('kick'));
+bindHold('staff',()=>attack('staff'));
+bindHold('block',()=>{input.block=true;player.block=true;player.action='block';},()=>{
+ input.block=false;player.block=false;
+ if(player.action==='block')player.action='idle';
 });
-stick.addEventListener('pointermove',e=>{
- if(e.pointerId===stickPointer)setJoystick(e);
-});
-stick.addEventListener('pointerup',resetJoystick);
-stick.addEventListener('pointercancel',resetJoystick);
 
 addEventListener('keydown',e=>{
- keys[e.key.toLowerCase()]=true;
- if(e.code==='Space'&&started&&grounded){jumpV=7;grounded=false;setAction(player,'jump',.25);}
- if(e.key.toLowerCase()==='f')attack(false);
- if(e.key.toLowerCase()==='g')attack(true);
+ if(e.repeat)return;
+ if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')input.left=true;
+ if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')input.right=true;
+ if(e.key==='ArrowUp'||e.key===' ')jump();
+ if(e.key.toLowerCase()==='j')attack('punch');
+ if(e.key.toLowerCase()==='k')attack('kick');
+ if(e.key.toLowerCase()==='l')attack('staff');
+ if(e.key.toLowerCase()==='b'){input.block=true;player.block=true;}
 });
-addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
-
-document.querySelector('#play').addEventListener('click',()=>{
- started=true;
- document.querySelector('#intro').style.display='none';
- msg.textContent='Defeat all three warriors!';
+addEventListener('keyup',e=>{
+ if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')input.left=false;
+ if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')input.right=false;
+ if(e.key.toLowerCase()==='b'){input.block=false;player.block=false;}
 });
 
-const clock=new THREE.Clock();
-const lookAt=new THREE.Vector3();
-const camTarget=new THREE.Vector3();
+function drawBackground(t){
+ const sky=ctx.createLinearGradient(0,0,0,H);
+ sky.addColorStop(0,'#111c35');sky.addColorStop(.56,'#3d3b5a');sky.addColorStop(1,'#171a29');
+ ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
 
-function animateCharacter(c,dt,moving,phase){
- const u=c.userData,j=u.joints;
- u.phase+=dt*(moving?9:2.2);
- u.actionTime=Math.max(0,u.actionTime-dt);
- u.hitFlash=Math.max(0,u.hitFlash-dt);
- const swing=Math.sin(u.phase)*.64*(moving?1:0);
- const idle=Math.sin(elapsed*1.5)*.025;
+ // Moon
+ ctx.fillStyle='#c8d5dc';ctx.beginPath();ctx.arc(W*.78,H*.20,Math.min(W,H)*.065,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#929db7';ctx.beginPath();ctx.arc(W*.80,H*.18,Math.min(W,H)*.055,0,Math.PI*2);ctx.fill();
 
- // Base locomotion.
- j.legs[0].rotation.x=swing;
- j.legs[1].rotation.x=-swing;
- j.arms[0].arm.rotation.x=-swing*.65;
- j.arms[1].arm.rotation.x=swing*.65;
- j.body.position.y=1.30+(moving?Math.abs(Math.sin(u.phase*2))*.035:idle);
- j.head.rotation.z=Math.sin(elapsed*1.3+phase)*.025;
-
- // Return to default pose before applying an action.
- j.body.rotation.x=THREE.MathUtils.lerp(j.body.rotation.x,0,dt*7);
- j.body.rotation.z=THREE.MathUtils.lerp(j.body.rotation.z,0,dt*7);
- j.weapon.rotation.x=THREE.MathUtils.lerp(j.weapon.rotation.x,0,dt*6);
- j.weapon.rotation.z=THREE.MathUtils.lerp(j.weapon.rotation.z,-.18,dt*6);
- for(const a of j.arms){
-  a.arm.rotation.z=THREE.MathUtils.lerp(a.arm.rotation.z,0,dt*7);
-  a.forearm.rotation.x=THREE.MathUtils.lerp(a.forearm.rotation.x,0,dt*7);
+ // Mountain silhouettes
+ for(let layer=0;layer<3;layer++){
+  ctx.fillStyle=['#252b43','#20243a','#181e30'][layer];
+  ctx.beginPath();ctx.moveTo(0,H*.56+layer*22);
+  for(let x=0;x<=W+20;x+=35){
+   ctx.lineTo(x,H*(.40+layer*.055)+Math.sin(x*.014+layer*2)*25+Math.cos(x*.035)*12);
+  }
+  ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
  }
 
- // Staff swings with torso and arm follow-through.
- if(u.action==='attack'&&u.actionTime>0){
-  const t=u.actionTime/.32;
-  const swingAngle=Math.sin((1-t)*Math.PI);
-  j.body.rotation.y=.65*swingAngle;
-  j.body.rotation.x=-.18*swingAngle;
-  j.arms[1].arm.rotation.x=-1.25*swingAngle;
-  j.arms[1].arm.rotation.z=-.6*swingAngle;
-  j.weapon.rotation.x=-1.8*swingAngle;
-  j.weapon.rotation.z=-.18-1.1*swingAngle;
- }else if(u.action==='power'&&u.actionTime>0){
-  const t=u.actionTime/.45;
-  const a=Math.sin((1-t)*Math.PI);
-  j.body.rotation.y=.95*a;
-  j.body.rotation.x=-.3*a;
-  j.arms[1].arm.rotation.x=-1.65*a;
-  j.arms[0].arm.rotation.x=-.8*a;
-  j.weapon.rotation.x=-2.2*a;
-  j.weapon.rotation.z=-.18-1.35*a;
- }else if(u.action==='hit'&&u.actionTime>0){
-  j.body.rotation.x=.25;
-  j.body.rotation.z=.2*Math.sin(u.actionTime*18);
- }else if(u.action==='jump'&&u.actionTime>0){
-  j.arms[0].arm.rotation.x=-.8;
-  j.arms[1].arm.rotation.x=-.8;
-  j.legs[0].rotation.x=-.4;
-  j.legs[1].rotation.x=.4;
+ // Bamboo silhouettes
+ for(let i=0;i<12;i++){
+  const x=(i*97+20)%W;
+  const base=floorY()+18;
+  ctx.strokeStyle='#101c25';ctx.lineWidth=3+(i%3);
+  ctx.beginPath();ctx.moveTo(x,base);ctx.lineTo(x-8,H*.15);ctx.stroke();
+  for(let j=0;j<5;j++){
+   const y=H*.2+j*40+(i%3)*8;
+   ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-4,y);ctx.lineTo(x-25,y-15);ctx.stroke();
+   ctx.beginPath();ctx.moveTo(x-4,y+12);ctx.lineTo(x+16,y-4);ctx.stroke();
+  }
+ }
+
+ // Ground
+ const gy=floorY();
+ const ground=ctx.createLinearGradient(0,gy,0,H);
+ ground.addColorStop(0,'#172b32');ground.addColorStop(1,'#070c17');
+ ctx.fillStyle=ground;ctx.fillRect(0,gy,W,H-gy);
+ ctx.strokeStyle='#5de2c266';ctx.lineWidth=1;
+ ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();
+ ctx.strokeStyle='#93b9b422';
+ for(let i=0;i<14;i++){
+  const x=(i/13)*W;
+  ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(W/2+(x-W/2)*.55,H);ctx.stroke();
  }
 }
 
-function animate(){
- requestAnimationFrame(animate);
- const dt=Math.min(clock.getDelta(),.04);
+function limb(x1,y1,x2,y2,width,color){
+ ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';
+ ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+}
+
+function drawFighter(f,t){
+ const ground=floorY(),base=ground-f.y;
+ const dir=f.face;
+ const enemy=f.enemy;
+ const black=enemy?'#090b15':'#050b14';
+ const edge=enemy?'#ff6e67':'#54f6cf';
+ const glow=enemy?'#d9364e':'#0cbf9b';
+ const moving=f.action==='walk';
+ const attacking=['punch','kick','staff'].includes(f.action)&&f.timer>0;
+ const phase=t*(moving?10:2);
+ const swing=moving?Math.sin(phase)*.5:0;
+ const crouch=f.crouch||f.action==='block';
+ const bob=moving?Math.abs(Math.sin(phase))*3:Math.sin(t*2+(enemy?1:0))*1.5;
+ const x=f.x,y=base+bob;
+ const front=dir;
+
+ ctx.save();ctx.translate(x,y);ctx.scale(front,1);
+ ctx.shadowColor=glow;ctx.shadowBlur=9;
+
+ // Ground shadow
+ ctx.shadowBlur=0;ctx.fillStyle='#0009';
+ ctx.beginPath();ctx.ellipse(0,3,27,6,0,0,Math.PI*2);ctx.fill();
+ ctx.shadowColor=glow;ctx.shadowBlur=8;
+
+ // Legs: bent during kick, crouch and movement
+ const legY=crouch? -27:-31;
+ let hipX=0,hipY=legY;
+ let foot1X=-10+ swing*12,foot1Y=-3;
+ let foot2X=10-swing*12,foot2Y=-3;
+ if(f.action==='kick'&&f.timer>0){
+  const a=Math.sin((1-f.timer/.43)*Math.PI);
+  foot2X=40*a;foot2Y=-35*a-3;
+ }
+ limb(hipX-5,hipY,foot1X,foot1Y,9,black);
+ limb(hipX+5,hipY,foot2X,foot2Y,9,black);
+ limb(foot1X,foot1Y,foot1X-7,0,10,black);
+ limb(foot2X,foot2Y,foot2X+9,0,10,black);
+
+ // Belt and torso
+ const torsoY=crouch?-49:-61;
+ ctx.fillStyle=black;
+ ctx.beginPath();
+ ctx.moveTo(-13,torsoY+3);ctx.lineTo(13,torsoY+3);
+ ctx.lineTo(17,hipY);ctx.lineTo(-17,hipY);ctx.closePath();ctx.fill();
+ // Cloth tails
+ ctx.fillStyle=enemy?'#52172a':'#064b45';
+ ctx.beginPath();ctx.moveTo(-10,hipY-3);ctx.lineTo(-21,hipY+14);
+ ctx.lineTo(-4,hipY+8);ctx.lineTo(3,hipY-1);ctx.fill();
+ // Chest
+ ctx.fillStyle=black;
+ ctx.beginPath();ctx.moveTo(-15,torsoY);ctx.lineTo(-11,torsoY-17);
+ ctx.lineTo(8,torsoY-20);ctx.lineTo(16,torsoY-4);
+ ctx.lineTo(12,hipY-3);ctx.lineTo(-12,hipY-3);ctx.closePath();ctx.fill();
+ // Armor markings
+ ctx.strokeStyle=edge;ctx.lineWidth=2;ctx.shadowBlur=12;
+ ctx.beginPath();ctx.moveTo(-10,torsoY-13);ctx.lineTo(8,torsoY-5);ctx.stroke();
+ ctx.beginPath();ctx.moveTo(-8,torsoY-4);ctx.lineTo(8,torsoY-13);ctx.stroke();
+
+ // Neck and head
+ const headY=torsoY-29;
+ ctx.fillStyle=black;
+ ctx.beginPath();ctx.arc(0,headY,11,0,Math.PI*2);ctx.fill();
+ // Hair spikes
+ ctx.beginPath();ctx.moveTo(-10,headY-3);ctx.lineTo(-16,headY-14);
+ ctx.lineTo(-5,headY-9);ctx.lineTo(0,headY-19);
+ ctx.lineTo(5,headY-9);ctx.lineTo(15,headY-13);
+ ctx.lineTo(10,headY+2);ctx.fill();
+ // Glowing eye
+ ctx.fillStyle=edge;ctx.shadowColor=edge;ctx.shadowBlur=12;
+ ctx.fillRect(4,headY-2,5,2);
+
+ // Arms with punch/block/staff poses
+ let rearX=-18,rearY=torsoY-7,frontX=17,frontY=torsoY-10;
+ if(f.action==='punch'&&f.timer>0){
+  const a=Math.sin((1-f.timer/.30)*Math.PI);
+  frontX=20+30*a;frontY=torsoY-13;
+  rearX=-17;rearY=torsoY-2;
+ }else if(f.action==='block'){
+  frontX=15;frontY=torsoY-24;
+  rearX=7;rearY=torsoY-17;
+ }else if(f.action==='staff'&&f.timer>0){
+  const a=Math.sin((1-f.timer/.56)*Math.PI);
+  frontX=20+18*a;frontY=torsoY-14-12*a;
+  rearX=-6;rearY=torsoY-5;
+ }else if(moving){
+  frontX=17+swing*13;frontY=torsoY-6;
+  rearX=-17-swing*13;rearY=torsoY-10;
+ }
+ limb(-10,torsoY-12,rearX,rearY,8,black);
+ limb(rearX,rearY,rearX-3,rearY+5,8,black);
+ limb(10,torsoY-12,frontX,frontY,8,black);
+ limb(frontX,frontY,frontX+4,frontY+4,8,black);
+
+ // Staff: long dark rod with bright tips
+ if(f.staff||f.action==='staff'){
+  const a=f.action==='staff'&&f.timer>0?Math.sin((1-f.timer/.56)*Math.PI):0;
+  ctx.save();
+  ctx.translate(frontX,frontY);
+  ctx.rotate(-.5-a*1.7);
+  ctx.shadowColor='#d5fff0';ctx.shadowBlur=10;
+  ctx.strokeStyle='#30241d';ctx.lineWidth=5;
+  ctx.beginPath();ctx.moveTo(-48,0);ctx.lineTo(48,0);ctx.stroke();
+  ctx.strokeStyle=edge;ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(-48,0);ctx.lineTo(-38,0);ctx.moveTo(38,0);ctx.lineTo(48,0);ctx.stroke();
+  ctx.restore();
+ }
+ ctx.restore();
+
+ // Enemy staff indicator
+ if(enemy&&f.hp>0){
+  ctx.fillStyle='#ff6b76';ctx.font='10px Arial';ctx.textAlign='center';
+  ctx.fillText('RONIN',x,base-100);
+ }
+}
+
+function drawEffects(dt){
+ for(let i=particles.length-1;i>=0;i--){
+  const p=particles[i];p.t-=dt;
+  p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=240*dt;
+  ctx.globalAlpha=clamp(p.t/.4,0,1);
+  ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+  if(p.t<=0)particles.splice(i,1);
+ }
+ ctx.globalAlpha=1;
+ for(let i=floatTexts.length-1;i>=0;i--){
+  const f=floatTexts[i];f.t-=dt;f.y-=30*dt;
+  ctx.globalAlpha=clamp(f.t/.8,0,1);ctx.fillStyle=f.color;
+  ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.fillText(f.text,f.x,f.y);
+  if(f.t<=0)floatTexts.splice(i,1);
+ }
+ ctx.globalAlpha=1;
+}
+
+function frame(now){
+ requestAnimationFrame(frame);
+ const dt=Math.min((now-last)/1000||0,.035);last=now;
  elapsed+=dt;
- crystal.rotation.y+=dt*.7;
- crystal.position.y=1.15+Math.sin(elapsed*2)*.12;
-
- attackCD=Math.max(0,attackCD-dt);
- powerCD=Math.max(0,powerCD-dt);
- invulnerable=Math.max(0,invulnerable-dt);
-
- let moving=false;
-
- if(started&&hp>0){
-  let x=joyX,y=joyY;
-  if(keys.a||keys.arrowleft)x-=1;
-  if(keys.d||keys.arrowright)x+=1;
-  if(keys.w||keys.arrowup)y-=1;
-  if(keys.s||keys.arrowdown)y+=1;
-  const len=Math.hypot(x,y);
-  if(len>1){x/=len;y/=len;}
-  moving=len>.08;
-
-  if(moving){
-   player.position.x+=x*5.1*dt;
-   player.position.z+=y*5.1*dt;
-   player.rotation.y=Math.atan2(-x,-y);
-   walkTime+=dt*10;
+ if(running&&!over){
+  if(player.hp>0){
+   player.block=input.block;
+   player.crouch=input.crouch;
+   if(!player.block&&player.action!=='punch'&&player.action!=='kick'&&player.action!=='staff'){
+    let direction=(input.right?1:0)-(input.left?1:0);
+    player.vx=direction*190;
+    if(direction!==0){
+     player.face=direction;
+     player.action='walk';
+    }else if(player.action==='walk')player.action='idle';
+   }else player.vx=0;
   }
-
-  player.position.x=THREE.MathUtils.clamp(player.position.x,-42,42);
-  player.position.z=THREE.MathUtils.clamp(player.position.z,-48,34);
-
-  jumpV-=17*dt;
-  player.position.y+=jumpV*dt;
-  if(player.position.y<=0){
-   player.position.y=0;jumpV=0;grounded=true;
-  }
-
-  animateCharacter(player,dt,moving,0);
-
-  // Enemy movement and counterattacks.
-  for(const e of enemies){
-   if(!e.visible)continue;
-   const d=new THREE.Vector3().subVectors(player.position,e.position);
-   d.y=0;
-   const distance=d.length();
-   let enemyMoving=false;
-
-   if(distance>1.65&&distance<40){
-    d.normalize();
-    e.position.addScaledVector(d,1.2*dt);
-    e.rotation.y=Math.atan2(-d.x,-d.z);
-    enemyMoving=true;
-   }else if(distance<=1.8){
-    e.userData.attackTimer-=dt;
-    if(e.userData.attackTimer<=0&&invulnerable<=0){
-     hp=Math.max(0,hp-7);
-     invulnerable=.6;
-     e.userData.attackTimer=1.15;
-     setAction(e,'attack',.3);
-     msg.textContent=hp>0?'Enemy hit you!':'Defeated! Refresh to restart.';
-     updateHUD();
-    }
-   }
-   animateCharacter(e,dt,enemyMoving,1);
-  }
- }else{
-  animateCharacter(player,dt,false,0);
+  doEnemyAI(dt);
+  updateFighter(player,dt);
+  updateFighter(enemy,dt);
+  comboTime=Math.max(0,comboTime-dt);
+  shake=Math.max(0,shake-20*dt);
  }
-
- lookAt.set(player.position.x,player.position.y+1.25,player.position.z);
- camTarget.set(player.position.x,player.position.y+4.0,player.position.z+7.6);
- camera.position.lerp(camTarget,1-Math.exp(-4.5*dt));
- camera.lookAt(lookAt);
- renderer.render(scene,camera);
+ ctx.save();
+ if(shake>0)ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+ drawBackground(elapsed);
+ // Draw farther fighter first
+ if(player.x<enemy.x){drawFighter(player,elapsed);drawFighter(enemy,elapsed);}
+ else{drawFighter(enemy,elapsed);drawFighter(player,elapsed);}
+ drawEffects(dt);
+ ctx.restore();
 }
 
-addEventListener('resize',()=>{
- camera.aspect=innerWidth/innerHeight;
- camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
- renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+$('play').addEventListener('click',()=>{
+ reset();running=true;
+ $('start').style.display='none';
 });
 
-updateHUD();
-animate();
+reset();
+requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
